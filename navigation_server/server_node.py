@@ -4,7 +4,7 @@ from threading import Thread
 
 from navigation_server.base_node import base_node
 from navigation_server.webapp.main import app as webapp
-# from navigation_server.webapp.main import sio
+from navigation_server.webapp.main import sio
 
 from navigation_server.webapp.database import createDatabase
 from navigation_server.webapp.apps.users.cruds.user_cruds import user_crud
@@ -39,6 +39,16 @@ def main(args=None):
 
 
     base_node.init_topics()
+
+    # register sio events
+    @sio.event
+    async def cmd_vel(sid, data):
+        linear_x = float(data["linear_x"])
+        angular_z = float(data["angular_z"])
+        # logger.info("robot_move \tx:{:2.2f}, \tz:{:2.2f}".format(linear_x, angular_z ))
+        base_node.cmd_vel_publisher.publish(linear_x, angular_z)
+    
+    
     rclpy.spin(base_node)
 
     base_node.destroy_node()

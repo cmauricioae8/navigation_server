@@ -6,7 +6,7 @@ from geometry_msgs.msg import Pose
 
 from .base_topics import BaseSubscriber
 from ..utils import euler_from_quaternion
-# from navigation_server.webapp.socket_io import emitEvent
+from navigation_server.webapp.socket_io import emitEvent
 
 
 class RobotPoseData:
@@ -92,4 +92,4 @@ class PoseSubscriber(BaseSubscriber):
 
         self.pose_data.update(position_x, position_y, orientation, covariance)
         self.pose_available = True
-        # emitEvent("robot_pose", self.pose_data.to_dict())
+        emitEvent("robot_pose", self.pose_data.to_dict())

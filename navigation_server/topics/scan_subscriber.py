@@ -7,7 +7,7 @@ from sensor_msgs.msg import LaserScan
 
 from .base_topics import BaseSubscriber
 from navigation_server.topics.data_types import PointData
-# from navigation_server.webapp.socket_io import emitEvent
+from navigation_server.webapp.socket_io import emitEvent
 
 logger = logging.getLogger("backend")
 
@@ -106,5 +106,5 @@ class ScanSubscriber(BaseSubscriber):
         self.scan_available = len(points) > 0
 
         # emit event
-        # if self.scan_available:
-        #     emitEvent("scan", self.scan_data.to_dict())
+        if self.scan_available:
+            emitEvent("scan", self.scan_data.to_dict())

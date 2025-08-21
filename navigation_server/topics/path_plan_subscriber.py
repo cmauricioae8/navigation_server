@@ -6,7 +6,7 @@ from nav_msgs.msg import Path
 from .base_topics import BaseSubscriber
 from navigation_server.utils import euler_from_quaternion
 from navigation_server.topics.data_types import PoseData
-# from navigation_server.webapp.socket_io import emitEvent
+from navigation_server.webapp.socket_io import emitEvent
 
 
 class PathPlanData:
@@ -90,5 +90,5 @@ class PathPlanSubscriber(BaseSubscriber):
         self.path_plan_data.update(poses)
         self.path_plan_available = len(poses) > 0
 
-        # if self.path_plan_available:
-        #     emitEvent("path_plan", self.path_plan_data.to_dict())
+        if self.path_plan_available:
+            emitEvent("path_plan", self.path_plan_data.to_dict())

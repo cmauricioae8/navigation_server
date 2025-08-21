@@ -5,7 +5,7 @@ import logging
 from rclpy.node import Node
 from rcl_interfaces.msg import Log
 from .base_topics import BaseSubscriber
-# from navigation_server.webapp.socket_io import emitEvent
+from navigation_server.webapp.socket_io import emitEvent
 
 logger = logging.getLogger("backend")
 
@@ -25,4 +25,4 @@ class NotificationSubscriber(BaseSubscriber):
         name = msg.name
         message = msg.msg
         logger.info(f"NOTIFICATIONS: {level} - {name} - {message}")
-        # emitEvent("notifications", {"data": message})
+        emitEvent("notifications", {"data": message})

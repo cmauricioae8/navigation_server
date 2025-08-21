@@ -8,7 +8,7 @@ from nav_msgs.msg import OccupancyGrid
 
 from .base_topics import BaseSubscriber
 from ..utils import image_to_base64_str
-# from navigation_server.webapp.socket_io import emitEvent
+from navigation_server.webapp.socket_io import emitEvent
 
 
 class MapColors:
@@ -138,7 +138,7 @@ class MapSubscriber(BaseSubscriber):
 
         if len(self.map_data.data) > 0:
             self.map_data.image = self.getMapImageFromData()
-            # emitEvent(self.event_name, {"data": self.map_data.to_dict()})
+            emitEvent(self.event_name, {"data": self.map_data.to_dict()})
 
         self.map_available = len(self.map_data.data) > 0
 
@@ -156,8 +156,6 @@ class MapSubscriber(BaseSubscriber):
                     continue
                 # add the layer data to the map data
                 self.map_data.data[i] = layer_data[i]
-        # print()
-        # print("Finish adding layer")
 
     def getMapImageFromData(self):
         if len(self.map_data.data) == 0:
