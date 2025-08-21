@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NavigationServer</title>
+  <link href="{{ url_for('static', path='/plugins/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', path='/plugins/highlight/atom-one-dark.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', path='/css/styles.css') }}" rel="stylesheet">
+  {% block references %}
+  {% endblock references %}
+</head>
+<body>
+    <nav class="navbar" style="background-color: #e3f2fd;">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{{ url_for('get_index') }}">
+            <img src="{{ url_for('static', path='/img/logo.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+            Navigation Server (Bridge between ROS 2 and the REST API Server)
+          </a>
+          <div class="navbar-item">
+            <p class="navbar-text">
+              {{request.state.user.username}}
+              {% if request.state.user.is_admin %}
+                  (Administador)
+              {% endif %}
+            </p>
+          </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a target="_blank" class="nav-link" href="{{ url_for('get_docs') }}">Documentación Swagger</a>
+              </li>
+              <li class="nav-item">
+                <a target="_blank" class="nav-link" href="{{ url_for('get_redoc') }}">Documentación Redoc</a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('get_logout') }}">Salir</a>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
+      style="position: relative; bottom: 0; width: 100%; height: 50px;">
+      <p class="col-md-4 mb-0 text-body-secondary"><strong>&copy; 2024 </strong>All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', path='/plugins/jquery/jquery.js') }}"></script>
+    <script src="{{ url_for('static', path='/plugins/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    
+    <script src="{{ url_for('static', path='/plugins/highlight/highlight.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/app.js') }}"></script>
+    {% block scripts %}
+    {% endblock scripts %}
+</body>
+</html>
