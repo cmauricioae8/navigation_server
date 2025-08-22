@@ -13,7 +13,7 @@ from navigation_server.webapp.settings import OperationMode
 from navigation_server.webapp.apps.base.errors import ERRORS
 
 from navigation_server.base_node import base_node
-# from navigation_server.modules.mode_manager import mode_manager
+from navigation_server.modules.mode_manager import mode_manager
 
 router = APIRouter()
 

@@ -6,7 +6,7 @@ from std_msgs.msg import Header
 from geometry_msgs.msg import Pose, PoseWithCovariance, PoseWithCovarianceStamped
 
 # Models
-# from navigation_server.webapp.apps.waypoints.models import Waypoint
+from navigation_server.webapp.apps.waypoints.models import Waypoint
 
 # Serializers
 from .base_topics import BasePublisher
@@ -33,7 +33,44 @@ class PosePublisher(BasePublisher):
         self.pub_data.header.stamp = self.node.get_clock().now().to_msg()
         self.pub_data.header.frame_id = "map"
         self.pub_data.pose = PoseWithCovariance()
-        # self.pub_data.pose.covariance = settings.INITIAL_POSE.COVARIANCE # TODO: define a default covariance
+        self.pub_data.pose.covariance = [
+                0.25,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.25,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.06853892326654787,
+            ]
 
         self.pub_data.pose.pose = Pose()
         self.pub_data.pose.pose.position.x = position_x
@@ -54,7 +91,7 @@ class PosePublisher(BasePublisher):
             logger.error("Can't publish to pose topic: {}".format(e))
             return False, "Can't publish to pose topic: {}".format(e)
 
-    # def set_pose_to_waypoint(self, waypoint: Waypoint) -> tuple[bool, str]:
-    #     return self.set_pose(
-    #         waypoint.position_x, waypoint.position_y, waypoint.orientation
-    #     )
+    def set_pose_to_waypoint(self, waypoint: Waypoint) -> tuple[bool, str]:
+        return self.set_pose(
+            waypoint.position_x, waypoint.position_y, waypoint.orientation
+        )

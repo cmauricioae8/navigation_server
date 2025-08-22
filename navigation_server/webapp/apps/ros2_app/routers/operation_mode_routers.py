@@ -9,7 +9,7 @@ from navigation_server.webapp.apps.ros2_app.serializers.operation_mode_serialize
     OperationModeResponseSerializer,
 )
 
-# from navigation_server.modules.mode_manager import mode_manager
+from navigation_server.modules.mode_manager import mode_manager
 
 router = APIRouter()
 

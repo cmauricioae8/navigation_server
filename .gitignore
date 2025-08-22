@@ -3,4 +3,5 @@
 __pycache__
 venv/
 log/
+NOTES.txt
 #find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf

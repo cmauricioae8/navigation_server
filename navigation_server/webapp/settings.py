@@ -142,6 +142,7 @@ class Settings:
     def __init__(self):
         
         # mode manager, for modes: static, teleoperation, mapping, waypoints, navigation
+        self.POSE_TO_SET: str = "same"  # "last_mode", "same", ""
         self.MODE_MANAGER: ModeManager = ModeManager()
         self.KEEPOUT_ZONES_PROCESS: Process = Process(
             COMMANDS=[
