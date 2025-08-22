@@ -12,9 +12,9 @@ import socketio
 
 # Import the models to create the tables, don't remove this import even if it's not used
 from .apps.users.models import User  # noqa: F401
-# from .apps.maps.models import Map # noqa: F401
-# from .apps.paths.models import Path  # noqa: F401
-# from .apps.waypoints.models import Waypoint # noqa: F401
+from .apps.maps.models import Map # noqa: F401
+from .apps.waypoints.models import Waypoint # noqa: F401
+from .apps.paths.models import Path  # noqa: F401
 
 from .database import engine
 from .dependencies import NotAuthenticatedException , static_dir, media_dir

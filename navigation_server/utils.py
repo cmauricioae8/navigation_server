@@ -17,17 +17,6 @@ def image_to_base64_str(image):
     imgStrBase64 = "data:image/{};base64,{}".format("png", imgBytesBase64.decode())
     return imgStrBase64
 
-"""
-def camera_image_to_base64_str(image):
-    try:
-        success, enc_image = cv.imencode(".jpeg", image, [cv.IMWRITE_JPEG_QUALITY, 50])
-    except Exception:
-        return ""
-    img_bytes = enc_image.tobytes()
-    imgBytesBase64 = base64.b64encode(img_bytes)
-    imgStrBase64 = "data:image/{};base64,{}".format("jpeg", imgBytesBase64.decode())
-    return imgStrBase64
-
 
 def map_png_to_base64_str(image):
     try:
@@ -37,6 +26,18 @@ def map_png_to_base64_str(image):
     img_bytes = enc_image.tobytes()
     imgBytesBase64 = base64.b64encode(img_bytes)
     imgStrBase64 = "data:image/{};base64,{}".format("png", imgBytesBase64.decode())
+    return imgStrBase64
+
+
+"""
+def camera_image_to_base64_str(image):
+    try:
+        success, enc_image = cv.imencode(".jpeg", image, [cv.IMWRITE_JPEG_QUALITY, 50])
+    except Exception:
+        return ""
+    img_bytes = enc_image.tobytes()
+    imgBytesBase64 = base64.b64encode(img_bytes)
+    imgStrBase64 = "data:image/{};base64,{}".format("jpeg", imgBytesBase64.decode())
     return imgStrBase64
 
 
