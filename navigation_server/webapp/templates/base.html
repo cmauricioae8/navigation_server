@@ -36,7 +36,9 @@
               <li class="nav-item">
                 <a target="_blank" class="nav-link" href="{{ url_for('get_redoc') }}">Documentación Redoc</a>
               </li>
-
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('get_test_events') }}">Pruebas Eventos</a>
+              </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('get_logout') }}">Salir</a>
               </li>
@@ -60,7 +62,7 @@
 
     <script src="{{ url_for('static', path='/plugins/jquery/jquery.js') }}"></script>
     <script src="{{ url_for('static', path='/plugins/bootstrap/bootstrap.bundle.min.js') }}"></script>
-    
+    <script src="{{ url_for('static', path='/plugins/socketio/socket.io.min.js') }}"></script>
     <script src="{{ url_for('static', path='/plugins/highlight/highlight.min.js') }}"></script>
     <script src="{{ url_for('static', path='/js/app.js') }}"></script>
     {% block scripts %}

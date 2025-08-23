@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- ------------ modes ------------ -->
+    <div class="card m-2" >
+        <div class="card-body">
+            <p class="card-text">Select a mode and a map to start</p>
+            <div class="input-group mb-3">
+                <select class="form-select" id="mode_select">
+                    <option value="static" selected>Static</option>
+                    <option value="teleoperation">Teleoperation</option>
+                    <option value="mapping">Mapping</option>
+                    <option value="waypoints">Waypoints</option>
+                    <option value="navigation">Navigation</option>
+                </select>
+                <select class="form-select" id="map_select">
+                </select>
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" value="" id="with_keepout_zones"> With keepout zones
+                </div>
+                <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="checkbox" value="" id="with_speed_limits"> With speed limits
+                </div>
+                <button class="btn btn-primary" type="button" id="start_mode">Start mode</button>
+            </div>
+
+            <p class="card-text">Only for navigation mode</p>
+            <div class="input-group" >
+                <select class="form-select" id="path_select">
+                </select>
+                <select class="form-select" id="navigation_mode_select">
+                    <option value="stop" selected>Stop</option>
+                    <option value="loop">Loop</option>
+                    <option value="once">Once</option>
+                    <option value="pause">Pause</option>
+                    <option value="resume">Resume</option>
+                    <option value="cancel_goal">Cancel goal</option>
+                </select>
+                <select class="form-select" id="laps_select">
+                    <option value="-1" selected>Forever</option>
+                    <option value="2">2</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                </select>
+                <button class="btn btn-primary" type="button" id="start_navigation">Start navigation</button>
+            </div>
+
+        </div>
+    </div>
+    <!-- --------------------------------------------------- -->
+</div>
+
+<div class="row">
+    <div class="col-4">
+        <!-- ------------ EVENT: map ------------ -->
+        <div class="card" >
+            <div class="card-header">
+                <h5 class="card-title">Event: map</h5>
+            </div>
+            <img id="map_image" width="640" height="480" class="card-img-top" alt="...">
+            <div class="card-body">
+                <a href="#" id="start_map" class="btn btn-primary">Get/Start</a>
+                <a href="#" id="stop_map" class="btn btn-danger">Stop</a>
+                <br>
+                
+                <input class="form-check-input" type="checkbox" value="" id="with_costmap_checkbox">
+                <label class="form-check-label" for="with_costmap_checkbox">
+                    with costmap
+                </label>
+                <br>
+                <input class="form-check-input" type="checkbox" value="" id="with_scan_checkbox">
+                <label class="form-check-label" for="with_scan_checkbox">
+                    with scan
+                </label>
+                <br>
+                <input class="form-check-input" type="checkbox" value="" id="with_path_plan_checkbox">
+                <label class="form-check-label" for="with_path_plan_checkbox">
+                    with path plan
+                </label>
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+
+    <div class="col-4">
+        <!-- ------------ EVENT: costmap ------------ -->
+        <div class="card" >
+            <div class="card-header">
+                <h5 class="card-title">Event: costmap</h5>
+            </div>
+            <img id="costmap_image" width="640" height="480" class="card-img-top" alt="...">
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+
+    <div class="col-12">
+        <!-- ------------ EVENTO: cmd_vel ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Teleoperation</h5>
+            </div>
+            <div class="card-body text-center">
+                <button id="cmd_forward" class="btn btn-primary">Forward</button>
+                <button id="cmd_backward" class="btn btn-primary">Backward</button>
+                <button id="cmd_left" class="btn btn-primary">Left</button>
+                <button id="cmd_right" class="btn btn-primary">Right</button>
+                <button id="cmd_stop" class="btn btn-danger">Stop</button>
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+    
+
+    <div class="col-4">
+        <!-- ------------ EVENTO: battery ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Event: battery</h5>
+            </div>
+            <div class="card-body">
+            <p class="card-text">Get current battery status of the robot</p>
+            <p class="card-text">voltage: <span id="battery_voltage"></span> </p>
+            <p class="card-text">Percentage: <span id="battery_percentage"></span> </p>
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+    <div class="col-4">
+        <!-- ------------ EVENTO: robot_pose ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Event: robot_pose</h5>
+            </div>
+            <div class="card-body">
+                <p>Position: <span id="position"></span></p>
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+    <div class="col-4">
+        <!-- ------------ EVENTO: scan ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Event: scan</h5>
+            </div>
+            <div class="card-body">
+                <p>Datos: <span id="scan"></span></p>
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+
+    <div class="col-4">
+        <!-- ------------ EVENTO: path_plan ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Event: path_plan</h5>
+            </div>
+            <div class="card-body">
+                <p>Datos: <span id="path_plan"></span></p>
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+
+    <div class="col-4">
+        <!-- ------------ EVENTO: on_moving ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Event: on_moving</h5>
+            </div>
+            <div class="card-body">
+                <p>Datos: <span id="on_moving"></span></p>
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+
+
+
+    <div class="col-4">
+        <!-- ------------ EVENTO: on_status_change ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Event: on_status_change</h5>
+            </div>
+            <div class="card-body">
+            <p class="card-text">When an operation mode starts or a navigation status has changed</p>
+            <p class="card-text">data: <pre id="on_status_change_label"></pre> </p>
+
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+
+</div>
+<!-- BEGIN toast -->
+<div class="position-fixed top-0 end-0 p-3 mt-5" style="z-index: 11">
+    <div id="toast_element" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+        <strong id="toast_title" class="me-auto"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="toast_body" class="toast-body"></div>
+    </div>
+    <div id="notification_toast_element" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+        <strong id="notification_toast_title" class="me-auto"></strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="notification_toast_body" class="toast-body"></div>
+    </div>
+</div>
+<!-- END toast -->
+{% endblock content %}
+
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/event_test.js') }}"></script>
+{% endblock scripts %}

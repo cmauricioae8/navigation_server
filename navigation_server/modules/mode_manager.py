@@ -30,8 +30,8 @@ class ModeManager(threading.Thread):
         self.mode_ready = True
         self.map_id = 0
         self.map = None
-        self.with_keepout_zones = True
-        self.with_speed_limits = True
+        self.with_keepout_zones = False
+        self.with_speed_limits = False
 
         self.processes = []
 
@@ -44,8 +44,8 @@ class ModeManager(threading.Thread):
         self,
         mode: OperationMode,
         map_id=0,
-        with_keepout_zones=True,
-        with_speed_limits=True,
+        with_keepout_zones=False,
+        with_speed_limits=False,
     ):
         # base_node.logger.info("inicio del set_mode------------------------------------------------")
         self.map_id = map_id if map_id is not None else 0

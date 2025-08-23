@@ -20,15 +20,13 @@ async def get_index(request: Request):
 async def get_favicon():
     return static_dir + "/img/favicon.ico"
 
-
-"""
 @router.get("/test_events", response_class=HTMLResponse)
 async def get_test_events(request: Request):
     if request.state.user is None:
         raise NotAuthenticatedException()
     return templates.TemplateResponse("home/event_test.html", {"request": request})
 
-
+"""
 @router.get("/delivery", response_class=HTMLResponse)
 async def get_delivery(request: Request):
     if request.state.user is None:
