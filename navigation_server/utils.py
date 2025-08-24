@@ -29,28 +29,6 @@ def map_png_to_base64_str(image):
     return imgStrBase64
 
 
-"""
-def camera_image_to_base64_str(image):
-    try:
-        success, enc_image = cv.imencode(".jpeg", image, [cv.IMWRITE_JPEG_QUALITY, 50])
-    except Exception:
-        return ""
-    img_bytes = enc_image.tobytes()
-    imgBytesBase64 = base64.b64encode(img_bytes)
-    imgStrBase64 = "data:image/{};base64,{}".format("jpeg", imgBytesBase64.decode())
-    return imgStrBase64
-
-
-def image_base64_to_bytes(base64_str: str):
-    if "base64," in base64_str:
-        imgStrBase64 = base64_str.split("base64,")[1]
-    else:
-        imgStrBase64 = base64_str
-    imgBytesBase64 = imgStrBase64.encode()
-    img_bytes = base64.b64decode(imgBytesBase64)
-    return img_bytes
-"""
-
 def euler_from_quaternion(
     x: float, y: float, z: float, w: float
 ) -> tuple[float, float, float]:

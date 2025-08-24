@@ -6,6 +6,7 @@ from navigation_server.base_node import base_node
 from navigation_server.webapp.main import app as webapp
 from navigation_server.webapp.main import sio
 from navigation_server.modules.mode_manager import mode_manager
+from navigation_server.modules.on_moving_supervisor import run_on_moving_supervisor
 
 from navigation_server.webapp.database import createDatabase
 from navigation_server.webapp.apps.users.cruds.user_cruds import user_crud
@@ -37,6 +38,12 @@ def main(args=None):
     )
     webapp_thread.daemon = True
     webapp_thread.start()
+
+
+    # start on moving supervisor
+    on_moving_supervisor_thread = Thread(target=run_on_moving_supervisor)
+    on_moving_supervisor_thread.daemon = True
+    on_moving_supervisor_thread.start()
 
 
     base_node.init_topics()

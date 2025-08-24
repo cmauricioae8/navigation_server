@@ -112,9 +112,10 @@ class BaseNode(Node):
             20.0,
             25.0,
             1
-        )        
+        )
+        # ros2 topic pub --rate 5 /voltage std_msgs/msg/Float64 data:\ 24.1     
 
-        self.stop_waypoints = []
+        # self.stop_waypoints = []
 
         self.logger.info("... BaseNode initialized")
 
@@ -122,8 +123,9 @@ class BaseNode(Node):
     def init_topics(self):
         # Try to subscribe and create the publishers for initial topics
         self.logger.info("Initializing topics ...")
+        
         self.cmd_vel_publisher.try_create_publisher()
-        self.pose_publisher.try_create_publisher()
+        # self.pose_publisher.try_create_publisher()
         self.mode_status_publisher.try_create_publisher()        
         self.notifications_subscriber.try_subscribe()
         self.battery_subscriber.try_subscribe()
