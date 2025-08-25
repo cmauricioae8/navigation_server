@@ -45,30 +45,10 @@ class PoseSubscriber(BaseSubscriber):
     ):
         super().__init__(node, topic_name, message_type, max_rate)
 
-        # attributes for pose topic
-        # state for pose topic
+        # attributes for pose topic. State for pose topic
         self.pose_data = RobotPoseData()
         self.pose_available = False
-
-        # assign message class
-        self.assign_message_class()
-
-    def assign_message_class(self):
         self.message_class = Pose
-
-    # def change_topic(self, topic_name: str, message_type: str):
-    #     if self.topic_name == topic_name:
-    #         return
-    #     # unsubscribe from current topic
-    #     self.try_unsubscribe()
-    #     self.node.logger.info(
-    #         f"Changing pose topic from '{self.topic_name}' to '{topic_name}'"
-    #     )
-    #     # change topic name and message type
-    #     self.topic_name = topic_name
-    #     self.message_type = message_type
-    #     # assign message class
-    #     self.assign_message_class()
 
     # override on subscribed
     def on_subscribed(self):

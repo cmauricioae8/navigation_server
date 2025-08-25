@@ -20,7 +20,7 @@ from navigation_server.base_node import base_node
 class ModeManager(threading.Thread):
     SET_SAME_POSE = "same"
     SET_LAST_MODE_POSE = "last_mode"
-    NO_SET_POSE = ""
+    # NO_SET_POSE = ""
 
     def __init__(self):
         threading.Thread.__init__(self)
@@ -192,13 +192,10 @@ class ModeManager(threading.Thread):
                 success_mode_startup = True
 
 
-            # Start Attemps to change mode
+            # Start Attempts to change mode
             attempt_number = 0
-            maximun_attempts = 3
-            while (
-                not success_mode_startup
-                and attempt_number < maximun_attempts #and len(error_codes) == 0
-            ):
+            maximum_attempts = 3
+            while( not success_mode_startup and attempt_number < maximum_attempts):
                 attempt_number += 1
                 base_node.logger.info(
                     f"---- Attempt to change mode #{attempt_number} "
@@ -273,9 +270,7 @@ class ModeManager(threading.Thread):
 
                 # wait to pose topic to confirm start mode
                 if self.desired_mode in (
-                    OperationMode.WAYPOINTS,
-                    OperationMode.NAVIGATION,
-                    OperationMode.MAPPING,
+                    OperationMode.WAYPOINTS, OperationMode.NAVIGATION, OperationMode.MAPPING
                 ):
                     base_node.logger.info("Wait to pose topic ...")
                     base_node.pose_subscriber.try_subscribe()
@@ -285,7 +280,9 @@ class ModeManager(threading.Thread):
                         (time.time() - t0_wait_pose) < timeout_wait_pose
                     ):
                         time.sleep(1.0)
+                        # publish an initial pose to received the correct pose from amcl_robot_pose
                         base_node.pose_publisher.set_pose(0.0, 0.0, 0.0)
+
                     if not base_node.pose_subscriber.pose_available:
                         base_node.logger.warning(
                             "*Modes*"
@@ -302,13 +299,9 @@ class ModeManager(threading.Thread):
 
                 # wait to map topic to confirm start mode
                 if (
-                    self.desired_mode
-                    in (
-                        OperationMode.MAPPING,
-                        OperationMode.WAYPOINTS,
-                        OperationMode.NAVIGATION,
-                    )
-                    and self.map_id > 0
+                    self.desired_mode in (
+                        OperationMode.MAPPING, OperationMode.WAYPOINTS, OperationMode.NAVIGATION
+                    ) and self.map_id > 0
                 ):
                     base_node.logger.info("Wait to map topic ...")
                     timeout_wait_map = 15.0
@@ -334,11 +327,11 @@ class ModeManager(threading.Thread):
 
                 # if reach this point, mode start success
                 success_mode_startup = True
-                # End attemps to change mode
+                # End attempts to change mode
 
             # if cant change mode after many attempts
             if not success_mode_startup:
-                out_msg = "Cant change from {} to {} after {} attemps".format(
+                out_msg = "Cant change from {} to {} after {} attempts".format(
                     self.mode, self.desired_mode, attempt_number
                 )
                 base_node.logger.error(f"*Modes*{out_msg}")
@@ -395,8 +388,8 @@ class ModeManager(threading.Thread):
                     current_pose.position_y,
                     current_pose.orientation,
                 )
-            elif settings.POSE_TO_SET == self.NO_SET_POSE:
-                base_node.logger.warning("NO SET POSE")
+            # elif settings.POSE_TO_SET == self.NO_SET_POSE:
+            #     base_node.logger.warning("NO SET POSE")
             else:
                 base_node.logger.warning(
                     "No exist last pose, SET POSE TO ZERO with initial covariance"

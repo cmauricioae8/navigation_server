@@ -39,7 +39,7 @@ class BaseNode(Node):
             elif environ["LIDAR_MODEL"] == "pacecat":
                 lidar_rotation_angle = 3.14159
             elif environ["LIDAR_MODEL"] == "pacecat_cr":
-                lidar_rotation_angle = 0
+                lidar_rotation_angle = 0.0
 
         if "ROBOT_MODEL" in environ:
             # TODO: Get params from ros params
@@ -113,7 +113,7 @@ class BaseNode(Node):
             25.0,
             1
         )
-        # ros2 topic pub --rate 5 /voltage std_msgs/msg/Float64 data:\ 24.1     
+        # ros2 topic pub --rate 5 /voltage std_msgs/msg/Float64 data:\ 24.1
 
         # self.stop_waypoints = []
 
@@ -125,7 +125,7 @@ class BaseNode(Node):
         self.logger.info("Initializing topics ...")
         
         self.cmd_vel_publisher.try_create_publisher()
-        # self.pose_publisher.try_create_publisher()
+        self.pose_publisher.try_create_publisher()
         self.mode_status_publisher.try_create_publisher()        
         self.notifications_subscriber.try_subscribe()
         self.battery_subscriber.try_subscribe()

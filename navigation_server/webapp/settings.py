@@ -2,7 +2,6 @@
 import os
 import logging
 import json
-# import requests
 from navigation_server.utils import EnumWithDescription as Enum
 
 logger = logging.getLogger(__name__)
@@ -17,6 +16,7 @@ class OperationMode(Enum):
     MAPPING = "mapping", "Mapeo"
     WAYPOINTS = "waypoints", "Punto de ruta"
     NAVIGATION = "navigation", "Navegación"
+
 
 class Process:
     def __init__(
@@ -41,6 +41,43 @@ class Process:
 
     def to_dict(self):
         return self.__dict__.copy()
+
+class Map:
+    def __init__(
+        self,
+        WITH_AXIS: bool = True,
+        # COLORS: MapColors = MapColors(),
+        SAVE_MAP_PROCESS: Process = Process(
+            COMMANDS=[
+                # commands to execute to save the map, mandatory include the {MAP_FILE}
+                # variable.
+                "ros2 run nav2_map_server map_saver_cli -f {MAP_FILE}"
+            ]
+        ),
+        # EMIT_EVENT_RATE: int = 10,
+    ):
+        self.WITH_AXIS: bool = WITH_AXIS  # if true, the map will be published with axis
+        # self.COLORS: MapColors = COLORS
+        self.SAVE_MAP_PROCESS: Process = SAVE_MAP_PROCESS
+        # self.EMIT_EVENT_RATE: int = EMIT_EVENT_RATE  # Hz
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        # data["COLORS"] = (
+        #     MapColors.from_dict(data["COLORS"]) if "COLORS" in data else MapColors()
+        # )
+        data["SAVE_MAP_PROCESS"] = (
+            Process.from_dict(data["SAVE_MAP_PROCESS"])
+            if "SAVE_MAP_PROCESS" in data
+            else Process()
+        )
+        return cls(**data)
+
+    def to_dict(self):
+        data = self.__dict__.copy()
+        # data["COLORS"] = self.COLORS.to_dict()
+        data["SAVE_MAP_PROCESS"] = self.SAVE_MAP_PROCESS.to_dict()
+        return data
 
 class ModeManager:
     def __init__(
@@ -144,6 +181,7 @@ class Settings:
         # mode manager, for modes: static, teleoperation, mapping, waypoints, navigation
         self.POSE_TO_SET: str = "same"  # "last_mode", "same", ""
         self.MODE_MANAGER: ModeManager = ModeManager()
+        self.MAP: Map = Map()
         self.KEEPOUT_ZONES_PROCESS: Process = Process(
             COMMANDS=[
                 (
@@ -168,6 +206,8 @@ class Settings:
             if "MODE_MANAGER" in data
             else ModeManager()
         )
+        self.MAP = Map.from_dict(data["MAP"]) if "MAP" in data else Map()
+
         self.KEEPOUT_ZONES_PROCESS = (
             Process.from_dict(data["KEEPOUT_ZONES_PROCESS"])
             if "KEEPOUT_ZONES_PROCESS" in data
@@ -187,6 +227,7 @@ class Settings:
     def to_dict(self):
         data = self.__dict__.copy()
         data["MODE_MANAGER"] = self.MODE_MANAGER.to_dict()
+        data["MAP"] = self.MAP.to_dict()
         data["KEEPOUT_ZONES_PROCESS"] = self.KEEPOUT_ZONES_PROCESS.to_dict()
         data["SPEED_LIMITS_PROCESS"] = self.SPEED_LIMITS_PROCESS.to_dict()
         # data["NAVIGATION_MANAGER"] = self.NAVIGATION_MANAGER.to_dict()

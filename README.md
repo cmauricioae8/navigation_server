@@ -1,5 +1,5 @@
 
-# Delivery_bridge
+# NAVIGATION_SERVER
 
 This package is a bridge between ROS 2 ecosystem and a REST API.
 
@@ -11,6 +11,14 @@ Tech Stack:
 - [ROS2 Humble](https://docs.ros.org/en/humble/index.html)
 - [Python SocketIO 5.7.2](https://python-socketio.readthedocs.io/en/latest/)
 - [FastAPI 0.105.0](https://fastapi.tiangolo.com/)
+
+## Pre-requisites
+
+Since this package is used as the back-end in robots of Octopy, to test correctly all functionalities that this repo provides, some configurations must be made:
+
+* At least packages 'core_interfaces', 'robot_bringup' and 'robot_core' must be built.
+* Environment variables both 'ROBOT_MODEL' and 'WITH_DEEP_CAM' must be added in the '.bashrc' file.
+* '~/.robot_config' folder with the corresponding files must exist.
 
 
 ## Installation

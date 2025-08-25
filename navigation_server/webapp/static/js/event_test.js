@@ -227,23 +227,20 @@ button_stop_map.addEventListener("click", function(){
 // ACTIONS FOR CMD_VEL
 button_cmd_forward.addEventListener("click", function(){
   console.log("cmd_forward");
-  // max: 0.3 m/s y 0.4 rad/s
   socketio.emit("cmd_vel", data={
-    linear_x: 0.4,
+    linear_x: 0.35,
     angular_z: 0.0
   });
 });
 button_cmd_backward.addEventListener("click", function(){
   console.log("cmd_backward");
-  // max: 0.3 m/s y 0.4 rad/s
   socketio.emit("cmd_vel", data={
-    linear_x: -0.4,
+    linear_x: -0.3,
     angular_z: 0.0
   });
 });
 button_cmd_left.addEventListener("click", function(){
   console.log("cmd_left");
-  // max: 0.3 m/s y 0.4 rad/s
   socketio.emit("cmd_vel", data={
     linear_x: 0.0,
     angular_z: 0.4
@@ -251,7 +248,6 @@ button_cmd_left.addEventListener("click", function(){
 });
 button_cmd_right.addEventListener("click", function(){
   console.log("cmd_right");
-  // max: 0.3 m/s y 0.4 rad/s
   socketio.emit("cmd_vel", data={
     linear_x: 0.0,
     angular_z: -0.4
