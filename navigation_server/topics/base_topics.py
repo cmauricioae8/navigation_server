@@ -59,7 +59,7 @@ class BaseSubscriber(BaseTopic):
         pass
 
     def try_subscribe(self):
-        # return if already suscribed
+        # return if already subscribed
         if self.subscriber is not None:
             return False
         if self.message_class is not None:
@@ -97,14 +97,14 @@ class BaseSubscriber(BaseTopic):
         pass
 
     def try_unsubscribe(self):
-        # return if already unsuscribed
+        # return if already unsubscribed
         if self.subscriber is None:
             return False
 
         if self.node.destroy_subscription(self.subscriber):
             self.subscriber = None
             self.on_unsubscribed()
-            self.node.logger.info(f"unsubcribed from '{self.topic_name}' topic")
+            self.node.logger.info(f"unsubscribed from '{self.topic_name}' topic")
             return True
         else:
             self.node.logger.warning(f"fail unsubscribe to '{self.topic_name}' topic")

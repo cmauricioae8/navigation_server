@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import logging
-
 from rclpy.node import Node
 from rcl_interfaces.msg import Log
 from .base_topics import BaseSubscriber
@@ -21,8 +20,6 @@ class NotificationSubscriber(BaseSubscriber):
 
     # override callback
     def callback(self, msg: Log):
-        level = msg.level
-        name = msg.name
         message = msg.msg
-        logger.info(f"NOTIFICATIONS: {level} - {name} - {message}")
+        logger.warning(f"***** NOTIFICATIONS: {msg.level} - {msg.name} - {message}")
         emitEvent("notifications", {"data": message})

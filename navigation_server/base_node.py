@@ -99,7 +99,7 @@ class BaseNode(Node):
         )
 
         self.notifications_subscriber = NotificationSubscriber(
-            self, "/notifications", "rcl_interfaces.msg.Log", -1
+            self, "/notifications", "rcl_interfaces/Log", -1
         )
 
         self.battery_subscriber = BatterySubscriber(

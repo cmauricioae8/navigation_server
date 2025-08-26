@@ -128,22 +128,22 @@ start_mode.addEventListener("click", function(){
   }
   
   $.ajax(
-      {
-          url: document.location.origin+"/ros/operation_mode/",
-          type: "POST",
-          //traditional:true,
-          headers: {
-            'accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          data: JSON.stringify(data),
-          success: function(data){
-              console.log("Set mode success");
-          },
-          error: function(data){
-            console.log(data);
-            alert("Error setting mode");
-          }
+    {
+      url: document.location.origin+"/ros/operation_mode/",
+      type: "POST",
+      //traditional:true,
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(data),
+      success: function(data){
+          console.log("Set mode success");
+      },
+      error: function(data){
+        console.log(data);
+        alert("Error setting mode");
+      }
   });
 });
 
@@ -311,5 +311,5 @@ socketio.on('on_moving', function(data) {
 });
 socketio.on('on_mode_change', function(data) {
   //console.log(data);
-  on_mode_change_element.innerHTML = data.mode;
+  on_mode_change_element.innerHTML = `${data.mode}`;
 });
