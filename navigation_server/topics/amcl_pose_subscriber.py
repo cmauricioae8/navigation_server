@@ -39,7 +39,7 @@ class RobotPoseData:
         }
 
 
-class PoseSubscriber(BaseSubscriber):
+class AmclPoseSubscriber(BaseSubscriber):
     def __init__(
         self, node: Node, topic_name: str, message_type: str, max_rate: int = -1
     ):

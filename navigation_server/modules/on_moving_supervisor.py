@@ -9,13 +9,13 @@ from navigation_server.webapp.socket_io import emitEvent
 def run_on_moving_supervisor():
     base_node.logger.info(">" * 50)
     base_node.logger.info("Start on moving supervisor")
-    last_pose = deepcopy(base_node.pose_subscriber.pose_data)
+    last_pose = deepcopy(base_node.amcl_pose_subscriber.pose_data)
     last_cmd_vel = deepcopy(base_node.cmd_vel_publisher.pub_data)
     t0_last = time.time()
     on_moving = False
     while True:
         time.sleep(1)
-        pose = base_node.pose_subscriber.pose_data
+        pose = base_node.amcl_pose_subscriber.pose_data
         cmd_vel = base_node.cmd_vel_publisher.pub_data
 
         # verify if robot is moving

@@ -12,10 +12,10 @@ from navigation_server.webapp.apps.waypoints.models import Waypoint
 from .base_topics import BasePublisher
 from navigation_server.utils import quaternion_from_euler
 
-logger = logging.getLogger("backend")
+logger = logging.getLogger("backend") ## info logger is not displayed in terminal
 
 
-class PosePublisher(BasePublisher):
+class InitialPosePublisher(BasePublisher):
     def __init__(self, node: Node, topic_name: str, message_type: str):
         super().__init__(node, topic_name, message_type)
 
@@ -85,7 +85,7 @@ class PosePublisher(BasePublisher):
 
         try:
             self.publisher.publish(self.pub_data)
-            logger.info("Published to pose topic")
+            logger.warning("Published to pose topic")
             return True, "Pose published"
         except Exception as e:
             logger.error("Can't publish to pose topic: {}".format(e))

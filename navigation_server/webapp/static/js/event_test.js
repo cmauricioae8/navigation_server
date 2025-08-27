@@ -120,8 +120,6 @@ start_mode.addEventListener("click", function(){
   console.log("Set mode");
   data = {
     mode: document.getElementById('mode_select').value,
-    with_keepout_zones: document.getElementById("with_keepout_zones").checked,
-    with_speed_limits: document.getElementById("with_speed_limits").checked,
   }
   if (document.getElementById("map_select").value){
     data.map_id = parseInt(document.getElementById("map_select").value);

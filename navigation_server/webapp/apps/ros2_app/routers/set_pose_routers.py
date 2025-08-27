@@ -40,7 +40,7 @@ def set_pose(request: Request, form: SetPoseRequestForm):
             error=ERRORS.NO_AVAILABLE_IN_MODE.value,
         )
 
-    status, response = base_node.pose_publisher.set_pose(
+    status, response = base_node.initialpose_publisher.set_pose(
         form.position_x, form.position_y, form.orientation
     )
 
@@ -75,7 +75,7 @@ def set_pose_to_waypoint(request: Request, form: SetPoseToWaypointRequestForm):
 
     waypoint = waypoint_crud.get(form.waypoint_id)
 
-    status, response = base_node.pose_publisher.set_pose_to_waypoint(waypoint)
+    status, response = base_node.initialpose_publisher.set_pose_to_waypoint(waypoint)
 
     if status:
         return SimpleResponse(status="OK", message=response)

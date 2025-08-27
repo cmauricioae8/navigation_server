@@ -6,7 +6,7 @@ from rcl_interfaces.msg import Log
 from .base_topics import BaseSubscriber
 from navigation_server.webapp.socket_io import emitEvent
 
-logger = logging.getLogger("backend")
+logger = logging.getLogger("backend") ## info logger is not displayed in terminal
 
 
 class NotificationSubscriber(BaseSubscriber):

@@ -4,8 +4,8 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 
 from navigation_server.topics.cmd_vel_publisher import CmdVelPublisher
-from navigation_server.topics.pose_publisher import PosePublisher
-from navigation_server.topics.pose_subscriber import PoseSubscriber
+from navigation_server.topics.initialpose_publisher import InitialPosePublisher
+from navigation_server.topics.amcl_pose_subscriber import AmclPoseSubscriber
 from navigation_server.topics.scan_subscriber import ScanSubscriber
 from navigation_server.topics.path_plan_subscriber import PathPlanSubscriber
 from navigation_server.topics.map_subscriber import MapSubscriber
@@ -29,39 +29,27 @@ class BaseNode(Node):
         environ = os.environ.copy()
 
         lidar_rotation_angle = 0
-        lidar_offset_x = 0
+        lidar_offset_x = 0.3
         lidar_offset_y = 0
 
-        if "LIDAR_MODEL" in environ:
-            self.logger.info(f"LIDAR_MODEL found = {environ['LIDAR_MODEL']}")
-            if environ["LIDAR_MODEL"] == "rplidar":
-                lidar_rotation_angle = 3.14159
-            elif environ["LIDAR_MODEL"] == "pacecat":
-                lidar_rotation_angle = 3.14159
-            elif environ["LIDAR_MODEL"] == "pacecat_cr":
-                lidar_rotation_angle = 0.0
+        LIDAR_MODEL=os.environ['LIDAR_MODEL']
+        self.logger.info(" LIDAR_MODEL: " + LIDAR_MODEL)
+        if LIDAR_MODEL == 'rplidar': # otherwise 0 as default
+            lidar_rotation_angle = 3.1415
 
-        if "ROBOT_MODEL" in environ:
-            # TODO: Get params from ros params
-            if environ["ROBOT_MODEL"] == "octybot":
-                lidar_offset_x = 0.0
-                lidar_offset_y = 0.0
-            elif environ["ROBOT_MODEL"] == "minibase":
-                lidar_offset_x = 0.0
-                lidar_offset_y = 0.0
-            elif environ["ROBOT_MODEL"] == "pickin":
-                lidar_offset_x = 0.0
-                lidar_offset_y = 0.0
-        
-        ## TODO: Define lidar_offset_x, lidar_offset_y, lidar_rotation_angle according to ROBOT_MODEL
+        ROBOT_MODEL=os.environ['ROBOT_MODEL']
+        self.logger.info(" ROBOT_MODEL: " + ROBOT_MODEL)
+        # This value is given in the ROBOT_MODEL_urdf.xacro file
+        if ROBOT_MODEL == 'minibase': lidar_offset_x = 0.24
+        elif ROBOT_MODEL == 'pickin' or ROBOT_MODEL == 'octybot': lidar_offset_x = 0.3              
         
         self.cmd_vel_publisher = CmdVelPublisher( self, "/cmd_vel", "geometry_msgs/Twist")
 
-        self.pose_publisher = PosePublisher(
+        self.initialpose_publisher = InitialPosePublisher(
             self, "/initialpose", "geometry_msgs/PoseWithCovarianceStamped"
         )
 
-        self.pose_subscriber = PoseSubscriber( self, "/amcl_robot_pose", "geometry_msgs/Pose", 5)
+        self.amcl_pose_subscriber = AmclPoseSubscriber( self, "/amcl_robot_pose", "geometry_msgs/Pose", 5)
 
         self.scan_subscriber = ScanSubscriber(
             self,
@@ -125,7 +113,7 @@ class BaseNode(Node):
         self.logger.info("Initializing topics ...")
         
         self.cmd_vel_publisher.try_create_publisher()
-        self.pose_publisher.try_create_publisher()
+        self.initialpose_publisher.try_create_publisher()
         self.mode_status_publisher.try_create_publisher()        
         self.notifications_subscriber.try_subscribe()
         self.battery_subscriber.try_subscribe()

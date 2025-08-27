@@ -17,7 +17,7 @@ Tech Stack:
 Since this package is used as the back-end in robots of Octopy, to test correctly all functionalities that this repo provides, some configurations must be made:
 
 * At least packages 'core_interfaces', 'robot_bringup' and 'robot_core' must be built.
-* Environment variables both 'ROBOT_MODEL' and 'WITH_DEEP_CAM' must be added in the '.bashrc' file.
+* Environment variables both 'ROBOT_MODEL', 'LIDAR_MODEL' and 'WITH_DEEP_CAM' must be added in the '.bashrc' file.
 * '~/.robot_config' folder with the corresponding files must exist.
 
 

@@ -112,7 +112,7 @@ def create_waypoint(waypoint_form: WaypointCreateForm):
         return ErrorResponse(
             status="FAIL", message="Waypoint already exists", error=ERRORS.NAME_UNIQUE
         )
-    if not base_node.pose_subscriber.pose_available:
+    if not base_node.amcl_pose_subscriber.pose_available:
         return ErrorResponse(
             status="FAIL",
             message="No hay datos de posición disponibles",
@@ -124,9 +124,9 @@ def create_waypoint(waypoint_form: WaypointCreateForm):
         is_mandatory=waypoint_form.is_mandatory,
         description=waypoint_form.description,
         map_id=waypoint_form.map,
-        position_x=base_node.pose_subscriber.pose_data.position_x,
-        position_y=base_node.pose_subscriber.pose_data.position_y,
-        orientation=base_node.pose_subscriber.pose_data.orientation,
+        position_x=base_node.amcl_pose_subscriber.pose_data.position_x,
+        position_y=base_node.amcl_pose_subscriber.pose_data.position_y,
+        orientation=base_node.amcl_pose_subscriber.pose_data.orientation,
     )
 
     waypoint = waypoint_crud.create(waypoint)

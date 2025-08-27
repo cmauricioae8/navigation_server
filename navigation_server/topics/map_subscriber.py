@@ -14,9 +14,9 @@ from navigation_server.webapp.socket_io import emitEvent
 class MapColors:
     def __init__(
         self,
-        WALL: list[int] = [140, 142, 144],
-        FLOOR: list[int] = [76, 102, 101],
-        UNKNOWN: list[int] = [24, 28, 35],
+        WALL: list[int] = [0, 0, 0],
+        FLOOR: list[int] = [255, 255, 255],
+        UNKNOWN: list[int] = [127, 127, 127],
         ALMOST_WALL: list[int] = [140, 70, 70],
         ALMOST_FLOOR: list[int] = [76, 102, 101],
     ):
