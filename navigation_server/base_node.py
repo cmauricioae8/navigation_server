@@ -3,6 +3,8 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 
+from navigation_server.webapp.socket_io import emitEvent
+
 from navigation_server.topics.cmd_vel_publisher import CmdVelPublisher
 from navigation_server.topics.initialpose_publisher import InitialPosePublisher
 from navigation_server.topics.amcl_pose_subscriber import AmclPoseSubscriber
@@ -12,6 +14,8 @@ from navigation_server.topics.map_subscriber import MapSubscriber
 from navigation_server.topics.mode_status_publisher import ModeStatusPublisher
 from navigation_server.topics.notification_subscriber import NotificationSubscriber
 from navigation_server.topics.battery_subscriber import BatterySubscriber
+
+from navigation_server.clients.navstack_client import NavStackClient
 
 
 class BaseNode(Node):
@@ -103,9 +107,21 @@ class BaseNode(Node):
         )
         # ros2 topic pub --rate 5 /voltage std_msgs/msg/Float64 data:\ 24.1
 
-        # self.stop_waypoints = []
+        self.navstack_client = NavStackClient(self)
+        self.stop_waypoints = []
 
         self.logger.info("... BaseNode initialized")
+
+        emitEvent(
+            "on_status_change",
+            {
+                "data": {
+                    "general": {
+                        "ready": True,
+                    }
+                }
+            },
+        )
 
 
     def init_topics(self):
@@ -117,6 +133,7 @@ class BaseNode(Node):
         self.mode_status_publisher.try_create_publisher()        
         self.notifications_subscriber.try_subscribe()
         self.battery_subscriber.try_subscribe()
+        self.navstack_client.try_create_client()
         self.logger.info("Topics initialized")
 
 

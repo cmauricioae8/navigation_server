@@ -14,7 +14,7 @@ from navigation_server.webapp.settings import OperationMode
 from navigation_server.webapp.settings import settings, APP_DATA_DIR
 from navigation_server.topics.amcl_pose_subscriber import RobotPoseData
 from navigation_server.base_node import base_node
-# from navigation_server.modules.navigation_manager import navigation_manager
+from navigation_server.modules.navigation_manager import navigation_manager
 
 
 class ModeManager(threading.Thread):
@@ -147,7 +147,7 @@ class ModeManager(threading.Thread):
             self.currently_changing_mode = True
 
             # cancel navigation and stop robot
-            # navigation_manager.cancel_navigation() #--------------------------------
+            navigation_manager.cancel_navigation() #--------------------------------
             base_node.cmd_vel_publisher.publish(0.0, 0.0)
 
             # get last pose

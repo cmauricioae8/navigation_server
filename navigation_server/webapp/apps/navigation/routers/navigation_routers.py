@@ -10,7 +10,7 @@ from navigation_server.webapp.apps.navigation.serializers.navigation_serializers
     NavigationResponseSerializer,
 )
 from navigation_server.webapp.apps.base.errors import ERRORS
-# from navigation_server.modules.navigation_manager import navigation_manager
+from navigation_server.modules.navigation_manager import navigation_manager
 from navigation_server.modules.navigation_manager_models import PathMode
 from navigation_server.modules.mode_manager import mode_manager
 from navigation_server.modules.mode_manager import OperationMode
