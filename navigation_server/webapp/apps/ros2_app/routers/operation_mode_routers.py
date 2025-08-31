@@ -23,7 +23,7 @@ def get_operation_mode():
     """
     Get current operation mode
 
-    Get the current operation mode from the robot.
+    Get the current operation mode from robot
     """
     return OperationModeResponseSerializer(
         status="OK",

@@ -16,6 +16,7 @@ from navigation_server.topics.notification_subscriber import NotificationSubscri
 from navigation_server.topics.battery_subscriber import BatterySubscriber
 
 from navigation_server.clients.navstack_client import NavStackClient
+# from navigation_server.clients.navigation_client import NavigationClient
 
 
 class BaseNode(Node):
@@ -30,7 +31,7 @@ class BaseNode(Node):
 
         ################################################################################
 
-        environ = os.environ.copy()
+        # environ = os.environ.copy()
 
         lidar_rotation_angle = 0
         lidar_offset_x = 0.3
@@ -108,6 +109,7 @@ class BaseNode(Node):
         # ros2 topic pub --rate 5 /voltage std_msgs/msg/Float64 data:\ 24.1
 
         self.navstack_client = NavStackClient(self)
+        # self.navigation_client = NavigationClient(self)
         self.stop_waypoints = []
 
         self.logger.info("... BaseNode initialized")
@@ -134,6 +136,7 @@ class BaseNode(Node):
         self.notifications_subscriber.try_subscribe()
         self.battery_subscriber.try_subscribe()
         self.navstack_client.try_create_client()
+        # self.navigation_client.try_create_client()
         self.logger.info("Topics initialized")
 
 

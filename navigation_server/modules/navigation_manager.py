@@ -35,8 +35,7 @@ from navigation_server.base_node import base_node # For ROS logger
 logger = logging.getLogger("nav_manager") # For back-end logger
 
 # Params that must be included as a ros params in base node
-DISTANCE_ERROR = 0.4
-ENABLE_GOAL_SUPERVISOR = True
+DISTANCE_ERROR = 0.25
 
 
 class NavigationManager:
@@ -77,6 +76,11 @@ class NavigationManager:
         elif path_id is not None and path_id > 0:
             self.path: Path = path_crud.get(path_id)
             self.stop_waypoints: list[StopWaypoint] = self.path.stop_waypoints()
+            
+            # Conversion from id to waypoint type
+            for stop_waypoint in self.stop_waypoints:
+                stop_waypoint.waypoint = waypoint_crud.get(stop_waypoint.waypoint)
+                # logger.warning(f"   new {stop_waypoint.waypoint=}")
             self.delivery_waypoint = None
         else:
             return False, "Waypoint or path is required"
@@ -84,10 +88,11 @@ class NavigationManager:
         if self.delivery_waypoint: ## ---------------------------------
             laps = 1
             self.path = Path()
-            self.path.name = "Delivery"
+            self.path.name = "_Delivery"
             self.stop_waypoints = []
-            delivery_stop_waypoint = StopWaypoint(self.delivery_waypoint.id)
-            delivery_stop_waypoint.attempts = 1
+
+            delivery_stop_waypoint = StopWaypoint(self.delivery_waypoint)
+            delivery_stop_waypoint.attempts = 0
             delivery_stop_waypoint.time_attempt = 0
             delivery_stop_waypoint.stop_time = 0.0
             self.stop_waypoints.append(delivery_stop_waypoint)
@@ -100,7 +105,6 @@ class NavigationManager:
             return False, message
 
         base_node.stop_waypoints = self.stop_waypoints
-
         self.mode = mode
         self.laps = laps
         self.next_stop_waypoint_attempts = 0
@@ -113,29 +117,24 @@ class NavigationManager:
         self.supervisor_thread.daemon = True
         self.supervisor_thread.start()
 
-        base_node.logger.info(
-            f"*Navigation*Navigation started for path: {self.path.name}"
-        )
-
+        base_node.logger.info(f"*Navigation*Navigation started for path: {self.path.name}")
         return True, "Navigation started"
     
-
+    
     def loop_navigation(self):
-        logger.info("start navigation loop thread for path: {}".format(self.path))
+        logger.warning("start navigation loop thread for path: {}".format(self.path.name))
 
         # set initial state
         self.on_navigation = True
         self.lap = 0
         self.next_stop_waypoint = None
         self.on_waypoint = False
-
         self.client.wait_until_ready()
 
         # start navigation loop
         while self.on_navigation:
             # for each waypoint in path
-            for stop_waypoint in self.stop_waypoints:
-                waypoint: Waypoint = waypoint_crud.get(stop_waypoint.waypoint)
+            for stop_waypoint in self.stop_waypoints:                
                 # new stop waypoint
                 self.next_stop_waypoint = stop_waypoint
                 self.next_stop_waypoint_attempts = 0
@@ -147,13 +146,12 @@ class NavigationManager:
                 while self.on_navigation:
                     # send goal if navigation is not paused
                     if not self.paused_navigation:
-                        logger.info("----------------------------------------")
-                        logger.info("for stop_waypoint: {}".format(str(stop_waypoint)))
+                        # base_node.logger.info("for stop_waypoint: {}".format(str(stop_waypoint)))
                         # send the goal and wait
-                        self.state = self.send_waypoint_and_wait(waypoint)
+                        self.state = self.send_waypoint_and_wait(stop_waypoint.waypoint)
 
                         self.message = self.state.description
-                        logger.info(
+                        logger.warning(
                             f""" End wait goal, state: {self.state.name}, message: {self.message}"""
                         )
 
@@ -171,9 +169,7 @@ class NavigationManager:
                         self.state = NavigationState.ACTIVE
                         self.message = "On route"
                         self.send_status_event()
-                        base_node.logger.info(
-                            "*Navigation*Navigation resumed (or cancelled)"
-                        )
+                        base_node.logger.info("*Navigation*Navigation resumed (or cancelled)")
                         continue
                     # check if navigation was cancelled
                     elif not self.on_navigation:
@@ -186,17 +182,14 @@ class NavigationManager:
                     elif self.cant_reach_wp:
                         logger.warning("Robot cant reach waypoint")
                         pass
-                    elif self.state != NavigationState.SUCCEEDED:
-                        logger.warning(f"Navigation failed: {self.state}")
-                        base_node.logger.warning(
-                            f"*Navigation*Navigation failed: {self.state}"
-                        )
+                    elif self.state != NavigationState.SUCCEEDED: ## -----------
+                        base_node.logger.warning(f"*Navigation*{self.state}")
                         pass
                     # check if navigation reached waypoint
                     elif (
                         self.state == NavigationState.SUCCEEDED or self.near_to_waypoint
                     ):
-                        logger.info("Navigation reached waypoint")
+                        logger.info("Waypoint reached")
                         self.on_waypoint = True
                         # publish event on websocket to notify
                         self.send_status_event()
@@ -206,31 +199,23 @@ class NavigationManager:
                             if stop_waypoint.stop_time is None
                             else stop_waypoint.stop_time
                         )
-                        # execute action
-                        # for action in stop_waypoint.actions:
-                        #     self.execute_action(action)
                         self.on_waypoint = False
                         # break loop for receive pause/resume navigation
                         break
 
                     # check if attempts limit reached
                     if (
-                        stop_waypoint.attempts != 0
+                        stop_waypoint.attempts > 0
                         and self.next_stop_waypoint_attempts  # attempts limit
                         >= stop_waypoint.attempts  # attempts limit reached
                     ):
-                        logger.warning(
-                            f"Cant reach waypoint {waypoint.name}, " "go to next"
-                        )
                         base_node.logger.warning(
-                            f"*Navigation* Cant reach waypoint {waypoint.name}, go to next"
-                        )
+                            f"*Navigation* Cant reach waypoint {stop_waypoint.waypoint.name}, go to next")
                         break
 
                     # if cant reach waypoint, try again
-                    logger.info("Cant reach waypoint, try again")
                     base_node.logger.info(
-                        "*Navigation*" f"Cant reach waypoint {waypoint.name}, try again"
+                        "*Navigation*" f"Cant reach waypoint {stop_waypoint.waypoint.name}, try again"
                     )
                     time.sleep(2.0)
 
@@ -268,16 +253,13 @@ class NavigationManager:
         base_node.cmd_vel_publisher.publish(0.0, 0.0)
 
         logger.info("end navigation loop thread for path: {}".format(self.path))
+        base_node.logger.info(f"*Navigation*Navigation finished for path: {self.path.name}")
         # publish event on websocket to notify
         self.send_status_event()
-        base_node.logger.info(
-            f"*Navigation*Navigation finished for path: {self.path.name}"
-        )
 
     
     def supervisor(self):
-        logger.info(
-            f"Start navigator supervisor, with distance error: {DISTANCE_ERROR}")
+        logger.warning(f"Start navigator supervisor, with distance error: {DISTANCE_ERROR}")
 
         while self.on_navigation:
             time.sleep(1.0)
@@ -285,88 +267,30 @@ class NavigationManager:
             if self.state != NavigationState.ACTIVE:
                 continue
 
-            # goal supervisor
-            if ENABLE_GOAL_SUPERVISOR:
-                # get current position
-                current_x = base_node.amcl_pose_subscriber.pose_data.position_x
-                current_y = base_node.amcl_pose_subscriber.pose_data.position_y
+            # get current position
+            current_x = base_node.amcl_pose_subscriber.pose_data.position_x
+            current_y = base_node.amcl_pose_subscriber.pose_data.position_y
 
-                # get waypoint position
-                logger.warning(f"---------------{self.next_stop_waypoint=}")
-                waypoint_x = self.next_stop_waypoint.waypoint.position_x
-                waypoint_y = self.next_stop_waypoint.waypoint.position_y
-                wp_name = self.next_stop_waypoint.waypoint.name
+            waypoint_x = self.next_stop_waypoint.waypoint.position_x
+            waypoint_y = self.next_stop_waypoint.waypoint.position_y
+            wp_name = self.next_stop_waypoint.waypoint.name
 
-                # get distance between current and waypoint
-                distance = math.sqrt(
-                    (current_x - waypoint_x) ** 2 + (current_y - waypoint_y) ** 2
-                )
-                ## ONLY DISTANCE IS VALIDATED, NOT ORIENTATION --------------
-                if distance < DISTANCE_ERROR:
-                    logger.warning(f"Near to waypoint {wp_name}, cancel goal")
-                    base_node.logger.warning(
-                        f"*Navigation*Near to waypoint {wp_name}, cancel goal"
-                    )
-                    self.client.cancel_goal()
-                    self.near_to_waypoint = True
+            # get distance between current and waypoint
+            distance = math.sqrt(
+                (current_x - waypoint_x) ** 2 + (current_y - waypoint_y) ** 2
+            )
 
-            # time supervisor
-            ## Cancel a goal by time is not recommended -------------
-            if ( self.next_stop_waypoint.time_attempt > 0
-                and (time.time() - self.next_stop_waypoint_start_time)
-                > self.next_stop_waypoint.time_attempt
-            ):
-                logger.warning(
-                    f"Time limit reached for waypoint {wp_name}, cancel goal"
-                )
-                base_node.logger.warning(
-                    "*Navigation*"
-                    f"Time limit reached for waypoint {wp_name}, "
-                    "cancel goal"
+            ## ONLY DISTANCE IS VALIDATED, NOT ORIENTATION
+            if distance < DISTANCE_ERROR: ## TODO: Validate orientation tolerance
+                base_node.logger.info(
+                    f"*Navigation*Near to waypoint {wp_name}, Supervisor cancels goal"
                 )
                 self.client.cancel_goal()
-                self.timeout_reached = True
+                self.near_to_waypoint = True
+            ## TODO: implement time supervisor by checking odometry for motion, not on_moving
 
-        logger.info("End navigator supervisor")
-
+        logger.warning("End navigator supervisor")
     
-    def cancel_navigation(self):
-        if self.on_navigation:
-            self.client.cancel_all_goals()
-            self.on_navigation = False
-            self.paused_navigation = False
-            return True
-        else:
-            return False
-
-    def pause_navigation(self):
-        if self.on_navigation:
-            self.client.cancel_goal()
-            # self.client.cancel_all_goals()
-            self.paused_navigation = True
-            return True
-        else:
-            return False
-
-    def resume_navigation(self):
-        if self.on_navigation:
-            self.paused_navigation = False
-            self.next_stop_waypoint_attempts = 0
-            return True
-        else:
-            return False
-
-    def cancel_goal(self):
-        if self.on_navigation:
-            logger.info("cancel goal")
-            self.client.cancel_goal()
-            return True
-        else:
-            return False
-
-    def on_fail_reach_wp(self):
-        pass
-
 
     def navigation_feedback_callback(self, feedback_msg):
         # calculate every second
@@ -409,32 +333,6 @@ class NavigationManager:
             else:
                 self.client.count_lost = 0
 
-            # Uncomment to enable supervisor when robot cant reach waypoint
-            """
-            if (
-               self.client.count_lost >= 20
-               and self.next_stop_waypoint.attempts == 0
-               and not self.paused_navigation
-               and euclidean_distance < 1.5
-            ):
-               logger.warning("The robot cant move, pause navigation")
-               self.pause_navigation()
-               self.on_fail_reach_wp(self.paused_navigation)
-
-            if (
-               self.client.count_lost >= 7
-               and self.next_stop_waypoint.attempts > 0
-               and not self.cant_reach_wp
-               # and euclidean_distance < 1.5
-            ):
-               logger.warning(
-                   "The robot not moving, cancel current goal and go to next"
-               )
-               self.client.cancel_goal()
-               self.cant_reach_wp = True
-               self.on_fail_reach_wp(False)
-            """
-
             logger.info(
                 f"NavCFb ETA:{eta:2.1f} s, "
                 f"Dr:{dr:2.2f} m, "
@@ -446,36 +344,47 @@ class NavigationManager:
                 f"d_doz:{delta_doz:2.1f} rad/s, "
                 f"cl:{self.client.count_lost}"
             )
-
-
-    def get_navigation_status(self) -> NavigationStatusSerializer:
-        waypoint = None
-        if self.next_stop_waypoint:
-            waypoint = waypoint_crud.get(self.next_stop_waypoint.waypoint)
-            # logger.warning(f"-------------------- {waypoint=}")
-        return NavigationStatusSerializer(
-            on_navigation=self.on_navigation,
-            paused_navigation=self.paused_navigation,
-            path=PathSimplestSerializer(self.path) if self.path else None,
-            mode=self.mode,
-            laps=self.laps,
-            lap=self.lap,
-            on_waypoint=self.on_waypoint,
-            next_waypoint=WaypointSimplestSerializer(waypoint) if waypoint else None,
-            attempt=self.next_stop_waypoint_attempts,
-            start_time=self.next_stop_waypoint_start_time,
-            state=self.state,
-            message=self.message,
-        )
     
 
-    def send_status_event(self):
-        emitEvent(
-            "on_status_change",
-            {"data": {"navigation": self.get_navigation_status().to_dict()}},
-        )
+    def on_fail_reach_wp(self):
+        pass
 
+    def cancel_navigation(self):
+        if self.on_navigation:
+            # self.client.cancel_all_goals()
+            self.client.cancel_goal()
+            self.on_navigation = False
+            self.paused_navigation = False
+            return True
+        else:
+            return False
     
+    def pause_navigation(self):
+        if self.on_navigation:
+            self.client.cancel_goal()
+            # self.client.cancel_all_goals()
+            self.paused_navigation = True
+            return True
+        else:
+            return False
+
+    def resume_navigation(self):
+        if self.on_navigation:
+            self.paused_navigation = False
+            self.next_stop_waypoint_attempts = 0
+            return True
+        else:
+            return False
+
+    def cancel_goal(self):
+        if self.on_navigation:
+            logger.info("cancel goal")
+            self.client.cancel_goal()
+            return True
+        else:
+            return False
+    
+
     def send_waypoint_and_wait(self, waypoint: Waypoint):
         self.timeout_reached = False
         self.cant_reach_wp = False
@@ -488,11 +397,38 @@ class NavigationManager:
         self.state = NavigationState.ACTIVE
         self.message = "On route"
 
-        # publish event on websocket to notify
-        self.send_status_event()
+        self.send_status_event() # publish event on websocket to notify
+        return self.client.wait_until_task_complete() # wait for goal response
+    
+    
+    def get_navigation_status(self) -> NavigationStatusSerializer:
+        next_waypoint_format = None
+        if self.next_stop_waypoint is not None:
+            logger.warning(f"*Navigation*Going to waypoint: {self.next_stop_waypoint.waypoint.name}")
+            next_waypoint_format = WaypointSimplestSerializer(self.next_stop_waypoint.waypoint)
+            # logger.warning(f"--------- {next_waypoint_format=}")
+            
+        return NavigationStatusSerializer(
+            on_navigation=self.on_navigation,
+            paused_navigation=self.paused_navigation,
+            path=PathSimplestSerializer(self.path) if self.path else None,
+            mode=self.mode,
+            laps=self.laps,
+            lap=self.lap,
+            on_waypoint=self.on_waypoint,
+            next_waypoint=next_waypoint_format, #
+            attempt=self.next_stop_waypoint_attempts,
+            start_time=self.next_stop_waypoint_start_time,
+            state=self.state,
+            message=self.message,
+        )
+    
 
-        # wait for goal response
-        return self.client.wait_until_task_complete()
+    def send_status_event(self):
+        emitEvent(
+            "on_status_change",
+            {"data": {"navigation": self.get_navigation_status().to_dict()}},
+        )
 
 
 navigation_manager = NavigationManager()

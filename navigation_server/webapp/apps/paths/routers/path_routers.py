@@ -43,7 +43,7 @@ def get_path(path_id: int):
     """
     Detalle de la trayectoria
 
-    Este endpoint retorna el detalle de un trayectoria en formato JSON
+    Este endpoint retorna el detalle de una trayectoria en formato JSON
     """
     path = path_crud.get_or_404(path_id)
     data = PathSerializer(path)
@@ -59,7 +59,7 @@ def get_paths_by_map(map_id: int):
     """
     Consultar las trayectorias por mapa
 
-    Este endpoint retorna una lista de trayectoria registrados en formato JSON
+    Este endpoint retorna una lista de trayectorias registrados en formato JSON
     """
     paths = path_crud.get_by_field("map_id", map_id, allows_multiple=True)
     data = [PathSerializer(path) for path in paths]

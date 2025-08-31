@@ -77,7 +77,7 @@ def create_map(map_form: MapCreateForm):
     """
     Crear mapa
 
-    Este endpoint permite crear una map, procedente del mapeo de una zona. Se crean automáticamente sus archivos _keepout y _speed
+    Este endpoint permite crear un mapa. Se crean automáticamente sus archivos _keepout y _speed
     """
     if mode_manager.mode != OperationMode.MAPPING:
         return ErrorResponse(
@@ -165,7 +165,7 @@ def delete_map(map_id: int):
     """
     Eliminar mapa
 
-    Este endpoint permite eliminar una mapa, y sus correspondientes archivos _keepout y _speed
+    Este endpoint permite eliminar un mapa, y sus correspondientes archivos _keepout y _speed
     """
     map: Map = Map().get(map_id)
     if map is None:
@@ -183,11 +183,5 @@ def delete_map(map_id: int):
     for waypoint in waypoints:
         waypoint_crud.delete(waypoint.id)
 
-    # delete keepout zones, with inner method
-    # for keepout_zone in map.get_keepout_zones():
-    #     keepout_zone.delete()
-    # delete speed limits, with inner method
-    # for speed_limit in map.get_speed_limits():
-    #     speed_limit.delete()
     map.delete()
     return SimpleResponse(status="OK", message="Map deleted")

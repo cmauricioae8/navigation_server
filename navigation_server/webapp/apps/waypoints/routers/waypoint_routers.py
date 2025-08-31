@@ -146,7 +146,7 @@ def create_waypoint(waypoint_form: WaypointCreateFormManual):
     """
     Crear waypoint con asignación manual de coordenadas
 
-    Este endpoint permite crear un waypoint en formato JSON.Si no se da una coord, será cero
+    Este endpoint permite crear un waypoint en formato JSON. Si no se da una coordenada, se llena con cero
     """
     if mode_manager.mode != OperationMode.WAYPOINTS:
         return ErrorResponse(
@@ -229,7 +229,7 @@ def delete_waypoint(waypoint_id: int):
     """
     Eliminar waypoint
 
-    Este endpoint permite eliminar una waypoint en formato JSON
+    Este endpoint permite eliminar un waypoint en formato JSON
     """
     waypoint_crud.delete(waypoint_id)
     return SimpleResponse(status="OK", message="Waypoint deleted")

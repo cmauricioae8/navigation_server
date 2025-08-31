@@ -17,9 +17,10 @@ class StopWaypointSerializer(BaseModel):
 
     def __init__(self, stop_waypoint: StopWaypoint):
         # Get child objects from database
-        waypoint = waypoint_crud.get(stop_waypoint.waypoint)
+        if isinstance(stop_waypoint.waypoint, int):
+            stop_waypoint.waypoint = waypoint_crud.get(stop_waypoint.waypoint)
         super().__init__(
-            waypoint=WaypointSerializer(waypoint) if waypoint else None,
+            waypoint=WaypointSerializer(stop_waypoint.waypoint) if stop_waypoint.waypoint else None,
             attempts=stop_waypoint.attempts,
             time_attempt=stop_waypoint.time_attempt,
             stop_time=stop_waypoint.stop_time,

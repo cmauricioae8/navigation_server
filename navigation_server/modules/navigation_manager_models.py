@@ -15,6 +15,7 @@ class NavigationState(Enum):
     READY = 0, "Navigation is ready to receive a goal"
     ACTIVE = 1, "Navigation is processing a goal"
     SUCCEEDED = 3, "Navigation successfully completed a goal"
+    # DISTANCE_S = 4, "Navigation canceled by distance tolerance (supervisor)"
     CANCELED = 10, "Navigation successfully canceled a goal"
     FAILED = 11, "Navigation failed to complete a goal"
     UNKNOWN = 12, "Navigation is in an unknown state"

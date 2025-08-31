@@ -22,3 +22,8 @@ class NavigationRequestForm(BaseModel):
         default=None,
         description="Valor: repeticiones de la trayectoria, -1 si bucle infinito",
     )
+
+class DeliveryRequestForm(BaseModel):
+    waypoint_id: int = Field(
+        description="ID del punto de entrega (delivery test)",
+    )

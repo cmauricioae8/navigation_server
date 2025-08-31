@@ -26,8 +26,8 @@ router = APIRouter()
 )
 def set_pose(request: Request, form: SetPoseRequestForm):
     """
-    Set the robot pose in the map. The position is given in meters and the
-    orientation in radians. Three fields MUST be provided.
+    Set the robot pose in the map. Publish on 'initialpose' topic. The position is 
+    given in meters and the orientation in radians. Three fields MUST be provided.
     """
     if not mode_manager.mode_ready or mode_manager.mode not in (
         OperationMode.TELEOPERATION,

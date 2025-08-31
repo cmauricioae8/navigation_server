@@ -4,6 +4,7 @@ from fastapi import APIRouter, status
 
 from navigation_server.webapp.apps.navigation.forms.navigation_forms import (
     NavigationRequestForm,
+    DeliveryRequestForm
 )
 from navigation_server.webapp.apps.base.serializers import SimpleResponse, ErrorResponse
 from navigation_server.webapp.apps.navigation.serializers.navigation_serializers import (
@@ -139,6 +140,49 @@ def set_navigation(form_data: NavigationRequestForm):
     # For mode: loop, reverse_loop, once
     status, response = navigation_manager.start_navigation(
         form_data.path_id, form_data.waypoint_id, form_data.mode, form_data.laps
+    )
+
+    if status:
+        return SimpleResponse(
+            status="OK",
+            message="Navigation start set",
+        )
+    else:
+        return ErrorResponse(
+            status="FAIL",
+            message="Navigation start fail",
+            error=response,
+        )
+
+
+@router.post(
+    "/delivery/",
+    response_model=Union[SimpleResponse, ErrorResponse],
+    status_code=status.HTTP_200_OK,
+)
+def delivery_test(form_data: DeliveryRequestForm):
+    """
+    Delivery
+
+    Receives the WP id to send the robot to that goal
+    """
+
+    if mode_manager.mode != OperationMode.NAVIGATION:
+        return ErrorResponse(
+            status="FAIL",
+            message="Nothing to do, Robot is not in navigation mode",
+            error=ERRORS.NO_AVAILABLE_IN_MODE,
+        )
+
+    if not mode_manager.mode_ready:
+        return ErrorResponse(
+            status="FAIL",
+            message="System error",
+            error=ERRORS.MODE_NOT_READY,
+        )
+    
+    status, response = navigation_manager.start_navigation(
+        0, form_data.waypoint_id, 'once', 0
     )
 
     if status:

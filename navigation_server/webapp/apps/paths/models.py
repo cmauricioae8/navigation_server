@@ -3,12 +3,13 @@ from sqlmodel import Field, Column
 from sqlalchemy import JSON
 
 from navigation_server.webapp.apps.base.models import BaseModel
+from navigation_server.webapp.apps.waypoints.models import Waypoint
 
 
 class StopWaypoint:
     def __init__(
         self,
-        waypoint: int,
+        waypoint: Waypoint,
         attempts: int = 0,  # 0: infinitely, 1: only one, n: n times
         time_attempt: int = 0,  # 0: infinitely, n: n seconds
         stop_time: float = 0.0,  # 0: no stop, n: n seconds
