@@ -21,19 +21,19 @@ class OperationMode(Enum):
 class Process:
     def __init__(
         self,
-        ENVIRON_VARS: dict = {},
+        # ENVIRON_VARS: dict = {},
         COMMANDS: list[str] = [],
-        ERROR_CODES: list[str] = [],
+        # ERROR_CODES: list[str] = [],
     ):
         # The environment variables that the below commands need to run,
         # in the format "ENV_VAR_NAME": "ENV_VAR_VALUE"
-        self.ENVIRON_VARS: dict = ENVIRON_VARS
+        # self.ENVIRON_VARS: dict = ENVIRON_VARS
         # The commands to execute to start the process, each command in a new string
         # separated by comma
         self.COMMANDS: list[str] = COMMANDS
         # The error codes that block the process, each error code in a new string
         # separated by comma
-        self.ERROR_CODES: list[str] = ERROR_CODES
+        # self.ERROR_CODES: list[str] = ERROR_CODES
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -56,7 +56,7 @@ class Map:
         ),
         # EMIT_EVENT_RATE: int = 10,
     ):
-        self.WITH_AXIS: bool = WITH_AXIS  # if true, the map will be published with axis
+        # self.WITH_AXIS: bool = WITH_AXIS  # if true, the map will be published with axis
         # self.COLORS: MapColors = COLORS
         self.SAVE_MAP_PROCESS: Process = SAVE_MAP_PROCESS
         # self.EMIT_EVENT_RATE: int = EMIT_EVENT_RATE  # Hz
@@ -107,9 +107,9 @@ class ModeManager:
             ]
         ),
     ):
-        self.MODE_TO_LOAD_ON_STARTUP: OperationMode = (
-            MODE_TO_LOAD_ON_STARTUP  # mapping, manual
-        )
+        # self.MODE_TO_LOAD_ON_STARTUP: OperationMode = (
+        #     MODE_TO_LOAD_ON_STARTUP  # mapping, manual
+        # )
         self.PROCESS_FOR_STATIC: Process = PROCESS_FOR_STATIC
         self.PROCESS_FOR_TELEOPERATION: Process = PROCESS_FOR_TELEOPERATION
         self.PROCESS_FOR_MAPPING: Process = PROCESS_FOR_MAPPING
@@ -168,11 +168,11 @@ class ModeManager:
         else:
             return Process()
 
-    def get_match_errors(
-        self, mode: OperationMode, current_errors: list[str]
-    ) -> list[str]:
-        process = self.get_process(mode)
-        return [error for error in process.ERROR_CODES if error in current_errors]
+    # def get_match_errors(
+    #     self, mode: OperationMode, current_errors: list[str]
+    # ) -> list[str]:
+    #     process = self.get_process(mode)
+    #     return [error for error in process.ERROR_CODES if error in current_errors]
 
 
 class Settings:

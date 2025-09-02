@@ -57,11 +57,14 @@ def main(args=None):
         base_node.logger.info("robot_move \tx:{:2.2f}, \tz:{:2.2f}".format(linear_x, angular_z ))
         base_node.cmd_vel_publisher.publish(linear_x, angular_z)
     
-    
-    rclpy.spin(base_node)
 
-    base_node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(base_node)
+    except KeyboardInterrupt:
+        print("Ctrl - C detected")
+        mode_manager.processes_stop()
+    finally:
+        base_node.destroy_node()
 
 
 if __name__ == "__main__":

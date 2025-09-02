@@ -87,7 +87,8 @@ class ModeManager(threading.Thread):
                 proc.kill()
             process.kill()
         except Exception as e:
-            base_node.logger.error(f"Error killing process: {e}")
+            # base_node.logger.error(f"Error killing process: {e}")
+            print(f"Error killing process: {e}")
 
     def supervise_process(self, popen_instance: Popen):
         base_node.logger.info(
@@ -106,10 +107,10 @@ class ModeManager(threading.Thread):
             "End supervise process ------------------------------------------------"
         )
 
-    def processes_add_command(self, env: dict, command: str):
-        env = {**environ, **env}
+    def processes_add_command(self, command: str):
+        # env = {**environ, **env}
         process = Popen(
-            command.split(), env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
         supervisor_thread = threading.Thread(
             target=self.supervise_process, args=(process,)
@@ -122,15 +123,18 @@ class ModeManager(threading.Thread):
 
     def processes_stop(self):
         if len(self.processes) > 0:
-            base_node.logger.info("Stopping processes ...")
+            # base_node.logger.info("Stopping processes ...")
+            print("Stopping processes ...")
             for process_item in self.processes:
                 self.kill_process(process_item["process"])
             for process_item in self.processes:
                 process_item["process"].wait()
-            base_node.logger.info("                   ... Processes stopped")
+            # base_node.logger.info("                   ... Processes stopped")
+            print("                   ... Processes stopped")
             self.processes = []
         else:
-            base_node.logger.info("No processes to stop")
+            # base_node.logger.info("No processes to stop")
+            print("No processes to stop")
 
     def run(self):
         # current_pose: RobotPoseData = None
@@ -208,7 +212,7 @@ class ModeManager(threading.Thread):
                             command = command.replace("{MAP_FILE}", "")
 
                     base_node.logger.info("Starting process: {}".format(command))
-                    self.processes_add_command(process_set.ENVIRON_VARS, command)
+                    self.processes_add_command(command)
                 ##############################
 
                 base_node.map_subscriber.try_subscribe()
@@ -217,7 +221,7 @@ class ModeManager(threading.Thread):
                 # start keepout_zones_process
                 if self.with_keepout_zones and self.desired_mode == OperationMode.NAVIGATION:
                     command = settings.KEEPOUT_ZONES_PROCESS.COMMANDS[0]
-                    env = settings.KEEPOUT_ZONES_PROCESS.ENVIRON_VARS
+                    # env = {} #settings.KEEPOUT_ZONES_PROCESS.ENVIRON_VARS
                     if "{MAP_FILE}" in command and self.map_id > 0:
                         try:
                             map_fullpath = path.join(
@@ -232,12 +236,12 @@ class ModeManager(threading.Thread):
                             command = command.replace("{MAP_FILE}", "")
                     if len(command) > 0:
                         base_node.logger.info("Starting process: {}".format(command))
-                        self.processes_add_command(env, command)
+                        self.processes_add_command(command)
 
                 # start speed_limits_process
                 if self.with_speed_limits and self.desired_mode == OperationMode.NAVIGATION:
                     command = settings.SPEED_LIMITS_PROCESS.COMMANDS[0]
-                    env = settings.SPEED_LIMITS_PROCESS.ENVIRON_VARS
+                    # env = settings.SPEED_LIMITS_PROCESS.ENVIRON_VARS
                     if "{MAP_FILE}" in command and self.map_id > 0:
                         try:
                             map_fullpath = path.join(
@@ -252,7 +256,7 @@ class ModeManager(threading.Thread):
                             command = command.replace("{MAP_FILE}", "")
                     if len(command) > 0:
                         base_node.logger.info("Starting process: {}".format(command))
-                        self.processes_add_command(env, command)
+                        self.processes_add_command(command)
 
                 # wait to pose topic to confirm start mode
                 if self.desired_mode in (
