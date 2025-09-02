@@ -34,9 +34,6 @@ from navigation_server.webapp.socket_io import emitEvent
 from navigation_server.base_node import base_node # For ROS logger
 logger = logging.getLogger("nav_manager") # For back-end logger
 
-# Params that must be included as a ros params in base node
-DISTANCE_ERROR = 0.25
-
 
 class NavigationManager:
     def __init__(self):
@@ -63,6 +60,9 @@ class NavigationManager:
         self.near_to_waypoint = False
         self.timeout_reached = False
         self.cant_reach_wp = False
+
+        self.nav_distance_error = None
+        self.nav_orientation_error = None
 
 
     def start_navigation(
@@ -109,6 +109,15 @@ class NavigationManager:
         self.laps = laps
         self.next_stop_waypoint_attempts = 0
 
+
+        base_node.nav_distance_tol = base_node.get_parameter('nav_distance_tol').get_parameter_value().double_value
+        base_node.nav_orientation_tol = base_node.get_parameter('nav_orientation_tol').get_parameter_value().double_value
+        
+        base_node.logger.info(
+            f"""*Navigation*Navigation started for path: {self.path.name}, with 
+            "distance_tol: {base_node.nav_distance_tol}, orient_tol: {base_node.nav_orientation_tol}"""
+        )
+
         myThread = threading.Thread(target=self.loop_navigation)
         myThread.daemon = True
         myThread.start()
@@ -116,8 +125,7 @@ class NavigationManager:
         self.supervisor_thread = threading.Thread(target=self.supervisor)
         self.supervisor_thread.daemon = True
         self.supervisor_thread.start()
-
-        base_node.logger.info(f"*Navigation*Navigation started for path: {self.path.name}")
+        
         return True, "Navigation started"
     
     
@@ -259,35 +267,45 @@ class NavigationManager:
 
     
     def supervisor(self):
-        logger.warning(f"Start navigator supervisor, with distance error: {DISTANCE_ERROR}")
+        time.sleep(1.0)
+        logger.warning("Start navigator supervisor")
 
         while self.on_navigation:
             time.sleep(1.0)
             # continue if navigation is not active
             if self.state != NavigationState.ACTIVE:
                 continue
+            
+            # update ros params
+            base_node.nav_distance_tol = base_node.get_parameter('nav_distance_tol').get_parameter_value().double_value
+            base_node.nav_orientation_tol = base_node.get_parameter('nav_orientation_tol').get_parameter_value().double_value
 
+            wp_name = self.next_stop_waypoint.waypoint.name
             # get current position
+            # logger.warning(f"------------{self.nav_distance_error=}, {self.nav_orientation_error}")
+
             current_x = base_node.amcl_pose_subscriber.pose_data.position_x
             current_y = base_node.amcl_pose_subscriber.pose_data.position_y
-
             waypoint_x = self.next_stop_waypoint.waypoint.position_x
             waypoint_y = self.next_stop_waypoint.waypoint.position_y
-            wp_name = self.next_stop_waypoint.waypoint.name
-
             # get distance between current and waypoint
             distance = math.sqrt(
                 (current_x - waypoint_x) ** 2 + (current_y - waypoint_y) ** 2
             )
+            base_node.logger.info(f"-------{distance=}")
+
+            if self.nav_distance_error is not None:
+                base_node.logger.warning("<<<<<<<<< Nav feedback can be used <<<<<<<<<<")
+                base_node.logger.info(f"{self.nav_distance_error=}, {self.nav_orientation_error=}")
 
             ## ONLY DISTANCE IS VALIDATED, NOT ORIENTATION
-            if distance < DISTANCE_ERROR: ## TODO: Validate orientation tolerance
+            if distance < base_node.nav_distance_tol and abs(self.nav_orientation_error) < base_node.nav_orientation_tol: ## TODO: Validate orientation tolerance
                 base_node.logger.info(
                     f"*Navigation*Near to waypoint {wp_name}, Supervisor cancels goal"
                 )
                 self.client.cancel_goal()
                 self.near_to_waypoint = True
-            ## TODO: implement time supervisor by checking odometry for motion, not on_moving
+            ## TODO: implement time supervisor by checking odometry/cmd_vel for motion, not on_moving
 
         logger.warning("End navigator supervisor")
     
@@ -310,7 +328,11 @@ class NavigationManager:
                 (current_position_x - self.client.goal_position_x) ** 2
                 + (current_position_y - self.client.goal_position_y) ** 2
             )
-            doz = abs(current_orientation - self.client.goal_orientation)
+
+            self.nav_distance_error = euclidean_distance
+            self.nav_orientation_error = current_orientation - self.client.goal_orientation
+
+            doz = abs(self.nav_orientation_error)
 
             eta = (
                 feedback_msg.feedback.estimated_time_remaining.sec

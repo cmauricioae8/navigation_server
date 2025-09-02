@@ -112,15 +112,18 @@ class BaseNode(Node):
         # self.navigation_client = NavigationClient(self)
         self.stop_waypoints = []
 
+        ## ROS params declaration
+        self.declare_parameter('nav_distance_tol', 0.25)
+        self.declare_parameter('nav_orientation_tol', 0.3)
+
+
         self.logger.info("... BaseNode initialized")
 
         emitEvent(
             "on_status_change",
             {
                 "data": {
-                    "general": {
-                        "ready": True,
-                    }
+                    "general": {"ready": True}
                 }
             },
         )

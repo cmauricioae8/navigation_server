@@ -14,11 +14,11 @@ from navigation_server.webapp.socket_io import emitEvent
 class MapColors:
     def __init__(
         self,
-        WALL: list[int] = [0, 0, 0],
-        FLOOR: list[int] = [255, 255, 255],
+        WALL: list[int] = [32, 32, 32],
+        FLOOR: list[int] = [224, 224, 224],
         UNKNOWN: list[int] = [127, 127, 127],
-        ALMOST_WALL: list[int] = [140, 70, 70],
-        ALMOST_FLOOR: list[int] = [76, 102, 101],
+        ALMOST_WALL: list[int] = [241, 244, 255],
+        ALMOST_FLOOR: list[int] = [224, 224, 224],
     ):
         # Color mapping for the map in RGB format, [R,G,B]. Range 0-255
         self.WALL: list[int] = WALL  # Color for the wall
@@ -122,8 +122,8 @@ class MapSubscriber(BaseSubscriber):
         # cell (0,0) in the map.
         # That is the coordinate of the lower left corner of your map in the reference
         # frame
-        origin_x = abs(msg.info.origin.position.x)
-        origin_y = msg.info.height * msg.info.resolution - abs(msg.info.origin.position.y)
+        origin_x = msg.info.origin.position.x #abs(msg.info.origin.position.x)
+        origin_y = msg.info.origin.position.y #msg.info.height * msg.info.resolution - abs(msg.info.origin.position.y)
         origin_rad = msg.info.origin.position.z
 
         self.map_data.update(
@@ -164,11 +164,25 @@ class MapSubscriber(BaseSubscriber):
             # Convert the map data to a numpy array with color values
             data = list(map(self.type_cell_to_color, self.map_data.data))
             img = np.array(data, dtype=np.uint8)
+
+            w,h,resol = self.map_data.width, self.map_data.height, self.map_data.resolution
+            pixel_x = int(-self.map_data.origin_x/resol)
+            pixel_y = int(-self.map_data.origin_y/resol)
+            image_y_pixel = h - 1 - pixel_y
+
             img = np.reshape(img, (self.map_data.height, self.map_data.width, 3))
             # flip the map because the map is mirrored
             img = cv.flip(img, 1)
             # rotate the map because the map is rotated 180 degrees
             img = cv.rotate(img, cv.ROTATE_180)
+
+            ## TODO: define which pixel_y to use ------------ 
+            cv.circle(img, (pixel_x, pixel_y), 5, (0,0,255), -1)
+            cv.circle(img, (pixel_x, image_y_pixel), 5, (255,0,0), -1) # This one should be
+
+            cv.line(img, (pixel_x, pixel_y), (pixel_x, pixel_y-25), (0,255,0), 3)
+            cv.line(img, (pixel_x, pixel_y), (pixel_x+25, pixel_y), (0,0,255), 3)
+
         except Exception as e:
             self.node.logger.error("ERROR: while transform map into openCV type: " + str(e))
             img = None
