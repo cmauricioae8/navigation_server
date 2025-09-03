@@ -24,6 +24,11 @@ class NavigationRequestForm(BaseModel):
     )
 
 class DeliveryRequestForm(BaseModel):
-    waypoint_id: int = Field(
+    waypoint_id: int | None = Field(
         description="ID del punto de entrega (delivery test)",
+        default=None,
+    )
+    waypoint_name: str | None = Field(
+        description="Nombre del punto de entrega (delivery test)",
+        default=None,
     )

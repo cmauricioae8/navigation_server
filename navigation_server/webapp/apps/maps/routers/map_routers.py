@@ -106,9 +106,6 @@ def create_map(map_form: MapCreateForm):
 
     map_file = path.join(APP_DATA_DIR, "media/maps/", map_name)
     # get the map image from the gmapping node
-    env = {**environ}
-    for env_var, value in settings.MAP.SAVE_MAP_PROCESS.ENVIRON_VARS.items():
-        env[env_var] = value
     processes = []
     for command in settings.MAP.SAVE_MAP_PROCESS.COMMANDS:
         base_node.logger.info("Starting process for save map: {}".format(command))
@@ -117,7 +114,7 @@ def create_map(map_form: MapCreateForm):
             base_node.logger.info("Map file: {}".format(map_file))
             command = command.replace("{MAP_FILE}", map_file)
 
-        processes.append(Popen(command.split(), env=env))
+        processes.append(Popen(command.split()))
 
     base_node.logger.info("Wait for saving map processes to finish")
     for process in processes:

@@ -12,20 +12,13 @@ from navigation_server.webapp.socket_io import emitEvent
 
 
 class MapColors:
-    def __init__(
-        self,
-        WALL: list[int] = [32, 32, 32],
-        FLOOR: list[int] = [224, 224, 224],
-        UNKNOWN: list[int] = [127, 127, 127],
-        ALMOST_WALL: list[int] = [241, 244, 255],
-        ALMOST_FLOOR: list[int] = [224, 224, 224],
-    ):
+    def __init__(self):
         # Color mapping for the map in RGB format, [R,G,B]. Range 0-255
-        self.WALL: list[int] = WALL  # Color for the wall
-        self.FLOOR: list[int] = FLOOR  # Color for the floor
-        self.UNKNOWN: list[int] = UNKNOWN  # Color for the unknown
-        self.ALMOST_WALL: list[int] = ALMOST_WALL  # Color for the almost wall
-        self.ALMOST_FLOOR: list[int] = ALMOST_FLOOR  # Color for the almost floor
+        self.WALL: list[int] = [32, 32, 32]  # Color for the wall
+        self.FLOOR: list[int] = [224, 224, 224]  # Color for the floor
+        self.UNKNOWN: list[int] = [127, 127, 127]  # Color for the unknown
+        self.ALMOST_WALL: list[int] = [50, 80, 120]  # Color for the almost wall
+        self.ALMOST_FLOOR: list[int] = [241, 244, 255]  # Color for the almost floor
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -110,30 +103,14 @@ class MapSubscriber(BaseSubscriber):
         self.map_available = False
 
     def safe_callback(self, msg: OccupancyGrid):
-        # self.node.logger.info(f"Map received from '{self.topic_name}' topic")
-        # print("Received a map of size %d x %d" % (msg.info.width, msg.info.height))
-        # print("Resolution: %.2f m/pix" % (msg.info.resolution))
-        # print("Origin: %.2f, %.2f, %.2f" % (
-        #  msg.info.origin.position.x,
-        #  msg.info.origin.position.y,
-        #  msg.info.origin.position.z))
-
-        # The origin of the map [m, m, rad].  This is the real-world pose of the
-        # cell (0,0) in the map.
-        # That is the coordinate of the lower left corner of your map in the reference
-        # frame
-        origin_x = msg.info.origin.position.x #abs(msg.info.origin.position.x)
-        origin_y = msg.info.origin.position.y #msg.info.height * msg.info.resolution - abs(msg.info.origin.position.y)
-        origin_rad = msg.info.origin.position.z
-
         self.map_data.update(
             list(msg.data),
             msg.info.width,
             msg.info.height,
             msg.info.resolution,
-            origin_x,
-            origin_y,
-            origin_rad,
+            msg.info.origin.position.x,
+            msg.info.origin.position.y,
+            msg.info.origin.position.z,
         )
 
         if len(self.map_data.data) > 0:
@@ -165,9 +142,9 @@ class MapSubscriber(BaseSubscriber):
             data = list(map(self.type_cell_to_color, self.map_data.data))
             img = np.array(data, dtype=np.uint8)
 
-            w,h,resol = self.map_data.width, self.map_data.height, self.map_data.resolution
-            pixel_x = int(-self.map_data.origin_x/resol)
-            pixel_y = int(-self.map_data.origin_y/resol)
+            h, resolution = self.map_data.height, self.map_data.resolution
+            pixel_x = int(-self.map_data.origin_x/resolution)
+            pixel_y = int(-self.map_data.origin_y/resolution)
             image_y_pixel = h - 1 - pixel_y
 
             img = np.reshape(img, (self.map_data.height, self.map_data.width, 3))
@@ -177,11 +154,11 @@ class MapSubscriber(BaseSubscriber):
             img = cv.rotate(img, cv.ROTATE_180)
 
             ## TODO: define which pixel_y to use ------------ 
-            cv.circle(img, (pixel_x, pixel_y), 5, (0,0,255), -1)
+            # cv.circle(img, (pixel_x, pixel_y), 5, (0,0,255), -1)
             cv.circle(img, (pixel_x, image_y_pixel), 5, (255,0,0), -1) # This one should be
 
-            cv.line(img, (pixel_x, pixel_y), (pixel_x, pixel_y-25), (0,255,0), 3)
-            cv.line(img, (pixel_x, pixel_y), (pixel_x+25, pixel_y), (0,0,255), 3)
+            cv.line(img, (pixel_x, image_y_pixel), (pixel_x, image_y_pixel-25), (0,255,0), 3)
+            cv.line(img, (pixel_x, image_y_pixel), (pixel_x+25, image_y_pixel), (0,0,255), 3)
 
         except Exception as e:
             self.node.logger.error("ERROR: while transform map into openCV type: " + str(e))
@@ -214,5 +191,4 @@ class MapSubscriber(BaseSubscriber):
                 ),
             )
         else:
-            # print("Unknown type cell: %d" % type_cell)
-            return (0, 0, 0)
+            return (0, 0, 0) # print("Unknown type cell: %d" % type_cell)

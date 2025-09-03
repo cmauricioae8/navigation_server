@@ -2,6 +2,11 @@
 from typing import Union
 from fastapi import APIRouter, status
 
+from navigation_server.webapp.apps.waypoints.cruds.waypoint_cruds import (
+    waypoint_crud,
+    validate_name_exists
+)
+from navigation_server.webapp.apps.waypoints.models import Waypoint
 from navigation_server.webapp.apps.navigation.forms.navigation_forms import (
     NavigationRequestForm,
     DeliveryRequestForm
@@ -164,7 +169,7 @@ def delivery_test(form_data: DeliveryRequestForm):
     """
     Delivery
 
-    Receives the WP id to send the robot to that goal
+    Receives either the WP id or the WP name to send the robot to that goal
     """
 
     if mode_manager.mode != OperationMode.NAVIGATION:
@@ -181,9 +186,28 @@ def delivery_test(form_data: DeliveryRequestForm):
             error=ERRORS.MODE_NOT_READY,
         )
     
-    status, response = navigation_manager.start_navigation(
-        0, form_data.waypoint_id, 'once', 0
-    )
+    if form_data.waypoint_id is not None: # If wp id is given
+        status, response = navigation_manager.start_navigation(
+            0, form_data.waypoint_id, 'once', 0
+        )
+    elif form_data.waypoint_name is not None: # If name is given, first get the wp id
+        if validate_name_exists(form_data.waypoint_name, mode_manager.map_id):
+            wp_result = waypoint_crud.get_by_fields(
+                {"name": form_data.waypoint_name, "map_id": mode_manager.map_id}
+            )
+            wp_id = wp_result.id
+            status, response = navigation_manager.start_navigation(0, wp_id, 'once', 0)
+        else:
+            return ErrorResponse(
+                status="FAIL",
+                message="Navigation start fail",
+                error=ERRORS.WAYPOINT_DOES_NOT_EXIST
+            )
+    else:
+        return ErrorResponse(
+            status="FAIL", message="Waypoint either Id or name not provided",
+            error="Fail")
+
 
     if status:
         return SimpleResponse(

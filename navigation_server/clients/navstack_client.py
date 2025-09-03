@@ -129,9 +129,6 @@ class NavStackClient:
             future = self.goal_handle.cancel_goal_async()
             future.add_done_callback(self._cancel_response_callback)
 
-    def cancel_all_goals(self):
-        logger.info("Canceling all goals...")
-        self.cancel_goal()
 
     def isTaskComplete(self):
         """Check if the task request of any type is complete yet."""

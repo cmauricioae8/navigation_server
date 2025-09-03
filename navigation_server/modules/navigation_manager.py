@@ -4,6 +4,7 @@ import time
 import threading
 import math
 import logging
+import subprocess
 
 # Models
 from navigation_server.webapp.apps.paths.cruds.path_cruds import path_crud
@@ -40,6 +41,11 @@ class NavigationManager:
         self.client: NavStackClient = base_node.navstack_client
         self.client.feedback_callback = self.navigation_feedback_callback
 
+        # Clear costmap service from terminal
+        self.clear_map_cmd = ' '.join(['ros2','service','call',\
+            '/local_costmap/clear_entirely_local_costmap','nav2_msgs/srv/ClearEntireCostmap',\
+            'request:\\','{}'])
+        
         self.mode = "stop"
         self.mode_ready = True
 
@@ -154,7 +160,11 @@ class NavigationManager:
                 while self.on_navigation:
                     # send goal if navigation is not paused
                     if not self.paused_navigation:
-                        # base_node.logger.info("for stop_waypoint: {}".format(str(stop_waypoint)))
+                        # Clear local costmap before starting
+                        p = subprocess.Popen(self.clear_map_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+                        stdoutdata, stderrdata = p.communicate()  #this is blocking
+                        # base_node.logger.info(f"{stdoutdata.decode()}---------")
+                        
                         # send the goal and wait
                         self.state = self.send_waypoint_and_wait(stop_waypoint.waypoint)
 
@@ -173,6 +183,7 @@ class NavigationManager:
                         # wait for resume navigation
                         while self.paused_navigation and self.on_navigation:
                             time.sleep(2.0)
+                        
                         logger.info("Navigation resumed (or cancelled)")
                         self.state = NavigationState.ACTIVE
                         self.message = "On route"
@@ -248,6 +259,8 @@ class NavigationManager:
         # stop supervisor thread
         try:
             logger.info("stop navigation supervisor")
+            self.nav_distance_error = None #----------
+            self.nav_orientation_error = None
             self.supervisor_thread.stop()
         except Exception:
             logger.warning("navigation supervisor was not running")
@@ -264,10 +277,11 @@ class NavigationManager:
         base_node.logger.info(f"*Navigation*Navigation finished for path: {self.path.name}")
         # publish event on websocket to notify
         self.send_status_event()
+        self.on_navigation = False # ----------------
 
     
     def supervisor(self):
-        time.sleep(1.0)
+        time.sleep(2.0)
         logger.warning("Start navigator supervisor")
 
         while self.on_navigation:
@@ -281,30 +295,22 @@ class NavigationManager:
             base_node.nav_orientation_tol = base_node.get_parameter('nav_orientation_tol').get_parameter_value().double_value
 
             wp_name = self.next_stop_waypoint.waypoint.name
-            # get current position
-            # logger.warning(f"------------{self.nav_distance_error=}, {self.nav_orientation_error}")
-
-            current_x = base_node.amcl_pose_subscriber.pose_data.position_x
-            current_y = base_node.amcl_pose_subscriber.pose_data.position_y
-            waypoint_x = self.next_stop_waypoint.waypoint.position_x
-            waypoint_y = self.next_stop_waypoint.waypoint.position_y
-            # get distance between current and waypoint
-            distance = math.sqrt(
-                (current_x - waypoint_x) ** 2 + (current_y - waypoint_y) ** 2
-            )
-            base_node.logger.info(f"-------{distance=}")
 
             if self.nav_distance_error is not None:
                 base_node.logger.warning("<<<<<<<<< Nav feedback can be used <<<<<<<<<<")
                 base_node.logger.info(f"{self.nav_distance_error=}, {self.nav_orientation_error=}")
 
-            ## ONLY DISTANCE IS VALIDATED, NOT ORIENTATION
-            if distance < base_node.nav_distance_tol and abs(self.nav_orientation_error) < base_node.nav_orientation_tol: ## TODO: Validate orientation tolerance
+            ## DISTANCE AND ORIENTATION ARE VALIDATED
+            if ( self.nav_distance_error < base_node.nav_distance_tol 
+                and abs(self.nav_orientation_error) < base_node.nav_orientation_tol
+            ):
                 base_node.logger.info(
                     f"*Navigation*Near to waypoint {wp_name}, Supervisor cancels goal"
                 )
                 self.client.cancel_goal()
                 self.near_to_waypoint = True
+            
+            ## TODO: Frontal_free verification for lane follower should be here
             ## TODO: implement time supervisor by checking odometry/cmd_vel for motion, not on_moving
 
         logger.warning("End navigator supervisor")
@@ -373,7 +379,6 @@ class NavigationManager:
 
     def cancel_navigation(self):
         if self.on_navigation:
-            # self.client.cancel_all_goals()
             self.client.cancel_goal()
             self.on_navigation = False
             self.paused_navigation = False
@@ -384,7 +389,6 @@ class NavigationManager:
     def pause_navigation(self):
         if self.on_navigation:
             self.client.cancel_goal()
-            # self.client.cancel_all_goals()
             self.paused_navigation = True
             return True
         else:
@@ -428,7 +432,6 @@ class NavigationManager:
         if self.next_stop_waypoint is not None:
             logger.warning(f"*Navigation*Going to waypoint: {self.next_stop_waypoint.waypoint.name}")
             next_waypoint_format = WaypointSimplestSerializer(self.next_stop_waypoint.waypoint)
-            # logger.warning(f"--------- {next_waypoint_format=}")
             
         return NavigationStatusSerializer(
             on_navigation=self.on_navigation,
