@@ -33,20 +33,21 @@ def main(args=None):
     
 
     # Start the webapp
-    webapp_thread = Thread(
-        target=uvicorn.run, kwargs={"app": webapp, "host": "0.0.0.0", "port": 9009}
-    )
-    webapp_thread.daemon = True
-    webapp_thread.start()
+    # webapp_thread = Thread(
+    #     target=uvicorn.run, kwargs={"app": webapp, "host": "0.0.0.0", "port": 9009}
+    # )
+    # webapp_thread.daemon = True
+    # webapp_thread.start()
 
 
     # start on moving supervisor
-    on_moving_supervisor_thread = Thread(target=run_on_moving_supervisor)
-    on_moving_supervisor_thread.daemon = True
-    on_moving_supervisor_thread.start()
+    # on_moving_supervisor_thread = Thread(target=run_on_moving_supervisor)
+    # on_moving_supervisor_thread.daemon = True
+    # on_moving_supervisor_thread.start()
 
 
     base_node.init_topics()
+    base_node.octysafe_get_params() # Get octy_safe_motion ros params
     mode_manager.start()
 
     # register sio events

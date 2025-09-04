@@ -8,7 +8,6 @@ from fastapi.requests import Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_login import LoginManager
 
-# from navigation_server.webapp.settings import SECRET_KEY
 from navigation_server.webapp.dependencies import NotAuthenticatedException, templates
 from navigation_server.webapp.apps.users.cruds.user_cruds import user_crud
 from navigation_server.webapp.apps.users.models import User

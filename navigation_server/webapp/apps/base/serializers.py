@@ -104,13 +104,6 @@ class DataWithPagination(BaseModel):
     records: list = Field(examples=[[]])
 
 """
-class EndpointSerializer(BaseSerializer):
-    url: str = ""
-    method: str = "POST"
-    payload: dict = {}
-    headers: dict = {}
-
-
 class SettingSerializer(BaseSerializer):
     settings_name: str = "settings"
     last_updated: str = ""

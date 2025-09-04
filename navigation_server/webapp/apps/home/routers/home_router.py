@@ -26,18 +26,4 @@ async def get_test_events(request: Request):
         raise NotAuthenticatedException()
     return templates.TemplateResponse("home/event_test.html", {"request": request})
 
-"""
-@router.get("/delivery", response_class=HTMLResponse)
-async def get_delivery(request: Request):
-    if request.state.user is None:
-        raise NotAuthenticatedException()
-    return templates.TemplateResponse("home/delivery.html", {"request": request})
-
-
-@router.get("/map_view", response_class=HTMLResponse)
-async def get_map_view(request: Request):
-    if request.state.user is None:
-        raise NotAuthenticatedException()
-    return templates.TemplateResponse("home/map_view.html", {"request": request})
-"""
 
