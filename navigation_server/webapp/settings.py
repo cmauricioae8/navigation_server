@@ -82,7 +82,7 @@ class Map:
 class ModeManager:
     def __init__(
         self,
-        MODE_TO_LOAD_ON_STARTUP: OperationMode = None,
+        # MODE_TO_LOAD_ON_STARTUP: OperationMode = None,
         PROCESS_FOR_STATIC: Process = Process(),
         PROCESS_FOR_TELEOPERATION: Process = Process(),
         PROCESS_FOR_MAPPING: Process = Process(

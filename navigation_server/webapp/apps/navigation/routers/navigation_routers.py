@@ -9,7 +9,8 @@ from navigation_server.webapp.apps.waypoints.cruds.waypoint_cruds import (
 from navigation_server.webapp.apps.waypoints.models import Waypoint
 from navigation_server.webapp.apps.navigation.forms.navigation_forms import (
     NavigationRequestForm,
-    DeliveryRequestForm
+    DeliveryRequestForm,
+    NavAdminControlRequestForm
 )
 from navigation_server.webapp.apps.base.serializers import SimpleResponse, ErrorResponse
 from navigation_server.webapp.apps.navigation.serializers.navigation_serializers import (
@@ -72,6 +73,7 @@ def set_navigation(form_data: NavigationRequestForm):
     # For mode: stop
     if form_data.mode == PathMode.STOP:
         if navigation_manager.on_navigation:
+            navigation_manager.admin_pause = False
             navigation_manager.cancel_navigation()
             return SimpleResponse(
                 status="OK",
@@ -90,7 +92,7 @@ def set_navigation(form_data: NavigationRequestForm):
                 status="OK",
                 message="Navigation already stopped",
             )
-        elif navigation_manager.paused_navigation:
+        elif navigation_manager.paused_navigation or navigation_manager.admin_pause: #----
             return SimpleResponse(
                 status="OK",
                 message="Navigation already paused",
@@ -113,6 +115,11 @@ def set_navigation(form_data: NavigationRequestForm):
             return SimpleResponse(
                 status="OK",
                 message="Navigation already resumed",
+            )
+        elif navigation_manager.admin_pause: #----------------------
+            return SimpleResponse(
+                status="FAIL",
+                message="Navigation paused by admin",
             )
         else:
             navigation_manager.resume_navigation()
@@ -158,6 +165,89 @@ def set_navigation(form_data: NavigationRequestForm):
             message="Navigation start fail",
             error=response,
         )
+
+
+@router.post(
+    "/admin_control",
+    response_model=Union[SimpleResponse, ErrorResponse],
+    status_code=status.HTTP_200_OK,
+)
+def admin_control(form_data: NavAdminControlRequestForm):
+    """
+    Admin Navigation Control request
+
+    Set the admin navigation control. The possible options are: pause, resume or stop the
+    current navigation.
+    """
+
+    if mode_manager.mode != OperationMode.NAVIGATION:
+        return ErrorResponse(
+            status="FAIL",
+            message="Nothing to do, Robot is not in navigation mode",
+            error=ERRORS.NO_AVAILABLE_IN_MODE,
+        )
+
+    if not mode_manager.mode_ready:
+        return ErrorResponse(
+            status="FAIL",
+            message="System error",
+            error=ERRORS.MODE_NOT_READY,
+        )
+
+    # For action: stop
+    if form_data.action == PathMode.STOP:
+        if navigation_manager.on_navigation:
+            navigation_manager.admin_pause = False
+            navigation_manager.cancel_navigation()
+            return SimpleResponse(
+                status="OK",
+                message="Navigation stopped",
+            )
+        else:
+            return SimpleResponse(
+                status="OK",
+                message="Navigation already stopped",
+            )
+
+    # For action: pause
+    elif form_data.action == PathMode.PAUSE:
+        if not navigation_manager.on_navigation:
+            return SimpleResponse(
+                status="OK",
+                message="Navigation already stopped",
+            )
+        elif navigation_manager.paused_navigation or navigation_manager.admin_pause:
+            return SimpleResponse(
+                status="OK",
+                message="Navigation already paused",
+            )
+        else:
+            navigation_manager.admin_pause = True
+            navigation_manager.pause_navigation()
+            return SimpleResponse(
+                status="OK",
+                message="Navigation paused by Admin",
+            )
+
+    # For action: resume
+    elif form_data.action == PathMode.RESUME:
+        if not navigation_manager.on_navigation:
+            return SimpleResponse(
+                status="OK",
+                message="Navigation already stopped",
+            )
+        elif not navigation_manager.paused_navigation and not navigation_manager.admin_pause: #---
+            return SimpleResponse(
+                status="OK",
+                message="Navigation already resumed",
+            )
+        else:
+            navigation_manager.admin_pause = False
+            navigation_manager.resume_navigation()
+            return SimpleResponse(
+                status="OK",
+                message="Navigation resumed",
+            )
 
 
 @router.post(

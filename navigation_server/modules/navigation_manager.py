@@ -51,6 +51,7 @@ class NavigationManager:
 
         self.on_navigation = False
         self.paused_navigation = False
+        self.admin_pause = False #Required for admin control EP
         self.path = None
         self.laps = 0
         self.lap = 0

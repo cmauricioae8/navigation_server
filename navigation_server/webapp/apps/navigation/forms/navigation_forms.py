@@ -23,6 +23,12 @@ class NavigationRequestForm(BaseModel):
         description="Valor: repeticiones de la trayectoria, -1 si bucle infinito",
     )
 
+class NavAdminControlRequestForm(BaseModel):
+    action: PathMode = Field(
+        description="Admin navigation control with priority",
+    )
+
+
 class DeliveryRequestForm(BaseModel):
     waypoint_id: int | None = Field(
         description="ID del punto de entrega (delivery test)",
