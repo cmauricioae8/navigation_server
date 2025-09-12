@@ -72,4 +72,4 @@ class AmclPoseSubscriber(BaseSubscriber):
 
         self.pose_data.update(position_x, position_y, orientation, covariance)
         self.pose_available = True
-        emitEvent("robot_pose", self.pose_data.to_dict())
+        # emitEvent("robot_pose", self.pose_data.to_dict())

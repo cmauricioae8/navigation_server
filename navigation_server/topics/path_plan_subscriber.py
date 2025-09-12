@@ -90,5 +90,5 @@ class PathPlanSubscriber(BaseSubscriber):
         self.path_plan_data.update(poses)
         self.path_plan_available = len(poses) > 0
 
-        if self.path_plan_available:
-            emitEvent("path_plan", self.path_plan_data.to_dict())
+        # if self.path_plan_available:
+        #     emitEvent("path_plan", self.path_plan_data.to_dict())

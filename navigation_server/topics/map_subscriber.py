@@ -14,11 +14,11 @@ from navigation_server.webapp.socket_io import emitEvent
 class MapColors:
     def __init__(self):
         # Color mapping for the map in RGB format, [R,G,B]. Range 0-255
-        self.WALL: list[int] = [32, 32, 32]  # Color for the wall
-        self.FLOOR: list[int] = [224, 224, 224]  # Color for the floor
+        self.WALL: list[int] = [0, 0, 0]  # Color for the wall
+        self.FLOOR: list[int] = [255,255,255]  # Color for the floor
         self.UNKNOWN: list[int] = [127, 127, 127]  # Color for the unknown
-        self.ALMOST_WALL: list[int] = [50, 80, 120]  # Color for the almost wall
-        self.ALMOST_FLOOR: list[int] = [241, 244, 255]  # Color for the almost floor
+        self.ALMOST_WALL: list[int] = [50, 210, 235]  # Color for the costmap
+        self.ALMOST_FLOOR: list[int] = [255, 0, 255]  # Color for the almost floor
 
     @classmethod
     def from_dict(cls, data: dict):
@@ -153,9 +153,7 @@ class MapSubscriber(BaseSubscriber):
             # rotate the map because the map is rotated 180 degrees
             img = cv.rotate(img, cv.ROTATE_180)
 
-            ## TODO: define which pixel_y to use ------------ 
-            # cv.circle(img, (pixel_x, pixel_y), 5, (0,0,255), -1)
-            cv.circle(img, (pixel_x, image_y_pixel), 5, (255,0,0), -1) # This one should be
+            cv.circle(img, (pixel_x, image_y_pixel), 5, (255,0,0), -1)
 
             cv.line(img, (pixel_x, image_y_pixel), (pixel_x, image_y_pixel-25), (0,255,0), 3)
             cv.line(img, (pixel_x, image_y_pixel), (pixel_x+25, image_y_pixel), (0,0,255), 3)

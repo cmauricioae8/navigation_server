@@ -1,9 +1,11 @@
 import os
+import cv2 as cv
+from math import cos, sin
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rcl_interfaces.srv import GetParameters, SetParameters
-from rcl_interfaces.msg import Parameter
+# from rcl_interfaces.msg import Parameter
 
 from navigation_server.webapp.socket_io import emitEvent
 
@@ -18,6 +20,7 @@ from navigation_server.topics.notification_subscriber import NotificationSubscri
 from navigation_server.topics.battery_subscriber import BatterySubscriber
 
 from navigation_server.clients.navstack_client import NavStackClient
+from .utils import image_to_base64_str, from_m_to_px
 
 
 class BaseNode(Node):
@@ -48,9 +51,7 @@ class BaseNode(Node):
         
         self.cmd_vel_publisher = CmdVelPublisher( self, "/cmd_vel", "geometry_msgs/Twist")
 
-        self.initialpose_publisher = InitialPosePublisher(
-            self, "/initialpose", "geometry_msgs/PoseWithCovarianceStamped"
-        )
+        self.initialpose_publisher = InitialPosePublisher(self, "/initialpose", "geometry_msgs/PoseWithCovarianceStamped")
 
         self.amcl_pose_subscriber = AmclPoseSubscriber( self, "/amcl_robot_pose", "geometry_msgs/Pose", 5)
 
@@ -109,6 +110,11 @@ class BaseNode(Node):
         self.navstack_client = NavStackClient(self)
         self.stop_waypoints = []
 
+        ## Timer to generate edited map with information
+        self.map_layers_timer = self.create_timer(0.5, self.generate_map_layers)
+        self.map_layers_timer.cancel()
+
+
         ## ROS params declaration of base_node
         self.declare_parameter('nav_distance_tol', 0.25)
         self.declare_parameter('nav_orientation_tol', 0.3)
@@ -150,6 +156,67 @@ class BaseNode(Node):
         self.navstack_client.try_create_client()
         self.logger.info("Topics initialized")
     
+
+    def generate_map_layers(self):
+        if self.map_subscriber is not None:
+            if self.map_subscriber.map_available and len(self.map_subscriber.map_data.data) > 0:
+                base_map_img = self.map_subscriber.getMapImageFromData()
+                height, resolution = self.map_subscriber.map_data.height, self.map_subscriber.map_data.resolution
+                o_x, o_y = self.map_subscriber.map_data.origin_x, self.map_subscriber.map_data.origin_y
+
+                #Add costmap is available
+                if self.costmap_subscriber.map_available and len(self.costmap_subscriber.map_data.data) > 0:
+                    costmap_img = self.costmap_subscriber.getMapImageFromData()
+                    base_map_img = base_map_img + costmap_img
+
+                #Add path data
+                if self.path_plan_subscriber.path_plan_available:
+                    n_points = len(self.path_plan_subscriber.path_plan_data.poses)
+                    for i in range(n_points-1):
+                        p = self.path_plan_subscriber.path_plan_data.poses[i]
+                        pf = self.path_plan_subscriber.path_plan_data.poses[i+1]
+
+                        px_x = from_m_to_px(p.position_x - o_x, resolution)
+                        px_y = from_m_to_px(p.position_y - o_y, resolution, True, height)
+
+                        pxf_x = from_m_to_px(pf.position_x - o_x, resolution)
+                        pxf_y = from_m_to_px(pf.position_y - o_y, resolution, True, height)
+                        
+                        # cv.circle(base_map_img, (px_x, px_y), 2, (0,200,0), -1)
+                        cv.line(base_map_img, (px_x, px_y), (pxf_x, pxf_y), (0,200,0), 1)
+                
+                #Add robot
+                if self.amcl_pose_subscriber.pose_available:
+                    pos_x = self.amcl_pose_subscriber.pose_data.position_x
+                    pos_y = self.amcl_pose_subscriber.pose_data.position_y
+                    orientation = self.amcl_pose_subscriber.pose_data.orientation
+
+                    pos_xf, pos_yf = pos_x + 0.5*cos(orientation), pos_y + 0.5*sin(orientation)
+
+                    pixel_x = from_m_to_px(pos_x - o_x, resolution)
+                    pixel_y = from_m_to_px(pos_y - o_y, resolution, True, height)
+                    pixel_xf = from_m_to_px(pos_xf - o_x, resolution)
+                    pixel_yf = from_m_to_px(pos_yf - o_y, resolution, True, height)
+
+                    cv.circle(base_map_img, (pixel_x, pixel_y), 7, (0,0,235), -1)
+                    cv.line(base_map_img, (pixel_x, pixel_y), (pixel_xf, pixel_yf), (0,0,235), 3)
+
+                #Add LiDAR data
+                if self.scan_subscriber.scan_available:
+                    for p in self.scan_subscriber.scan_data.points:
+                        #Compensate robot orientation
+                        pr_x = p.x * cos(orientation) - p.y * sin(orientation)
+                        pr_y = p.x * sin(orientation) + p.y * cos(orientation)
+                        
+                        #Compensate robot position
+                        px_x = from_m_to_px(pr_x + pos_x - o_x, resolution)
+                        px_y = from_m_to_px(pr_y + pos_y - o_y, resolution, True, height)
+                        
+                        cv.circle(base_map_img, (px_x, px_y), 2, (255,0,0), -1)
+
+                maplayers_dict = {"data": {"image": image_to_base64_str(base_map_img)}}
+                emitEvent("maplayers", maplayers_dict)
+
 
     def octysafe_get_params(self):
         if not self.octysafe_get_param_cli.wait_for_service(timeout_sec=1.0):

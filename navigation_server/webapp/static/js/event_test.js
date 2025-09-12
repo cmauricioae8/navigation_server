@@ -51,6 +51,7 @@ var with_path_plan_checkbox = document.getElementById("with_path_plan_checkbox")
 // ELEMENTS FOR MAPS
 var map_image = document.getElementById("map_image");
 var costmap_image = document.getElementById("costmap_image");
+var map_ayers_image = document.getElementById("maplayers_image");
 var button_start_map = document.getElementById("start_map");
 var button_stop_map = document.getElementById("stop_map");
 
@@ -203,6 +204,9 @@ button_start_map.addEventListener("click", function(){
                   path_plan_element.innerHTML += `(${data.data.path_plan_data.poses[i].position_x}, ${data.data.path_plan_data.poses[i].position_y}, ${data.data.path_plan_data.poses[i].orientation})<br>`;
                 }
               }
+              if(data.data.maplayers_data){
+                maplayers_image.src = data.data.maplayers_data.image;
+              }
           }
   });
 });
@@ -271,6 +275,11 @@ socketio.on("map", (msg) => {
 socketio.on("costmap", (msg) => {
   //console.log("costmap");
   costmap_image.src = msg.data.image;
+});
+// maplayers
+socketio.on("maplayers", (msg) => {
+  // console.log("maplayers");
+  maplayers_image.src = msg.data.image;
 });
 // battery
 socketio.on("battery", (msg) => {

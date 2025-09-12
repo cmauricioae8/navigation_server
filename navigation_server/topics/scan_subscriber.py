@@ -102,6 +102,5 @@ class ScanSubscriber(BaseSubscriber):
         self.scan_data.update(points, min_distance, min_angle)
         self.scan_available = len(points) > 0
 
-        # emit event
-        if self.scan_available:
-            emitEvent("scan", self.scan_data.to_dict())
+        # if self.scan_available:
+        #     emitEvent("scan", self.scan_data.to_dict())

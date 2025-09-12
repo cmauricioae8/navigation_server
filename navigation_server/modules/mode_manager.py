@@ -373,6 +373,11 @@ class ModeManager(threading.Thread):
             self.send_status_event()
             self.currently_changing_mode = False
 
+            if self.mode in (OperationMode.MAPPING, OperationMode.WAYPOINTS, OperationMode.NAVIGATION):
+                base_node.map_layers_timer.reset()
+            else:
+                base_node.map_layers_timer.cancel()
+
     def send_status_event(self):
         emitEvent(
             "on_status_change",

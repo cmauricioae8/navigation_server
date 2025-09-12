@@ -9,9 +9,7 @@ from cv2 import imread, imwrite
 
 from navigation_server.webapp.apps.base.models import BaseModel
 from navigation_server.utils import (
-    map_png_to_base64_str,
-    # image_base64_to_bytes,
-    # EnumWithDescription as Enum,
+    image_to_base64_str
 )
 from navigation_server.webapp.config import APP_DATA_DIR, try_delete_media_file
 
@@ -32,7 +30,7 @@ class Map(BaseModel, table=True):
 
     def to_base64(self) -> str:
         img = imread(join(APP_DATA_DIR, "media/", self.pgm_path), cv.IMREAD_GRAYSCALE)
-        return map_png_to_base64_str(img)
+        return image_to_base64_str(img)
 
     # def to_base64_original(self) -> str:
     #     img = imread(

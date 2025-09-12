@@ -18,15 +18,11 @@ def image_to_base64_str(image):
     return imgStrBase64
 
 
-def map_png_to_base64_str(image):
-    try:
-        success, enc_image = cv.imencode(".png", image)
-    except Exception:
-        return ""
-    img_bytes = enc_image.tobytes()
-    imgBytesBase64 = base64.b64encode(img_bytes)
-    imgStrBase64 = "data:image/{};base64,{}".format("png", imgBytesBase64.decode())
-    return imgStrBase64
+def from_m_to_px(pos_m, resolution, v_mirror=False, h=0) -> int:
+    pos_px = int( pos_m/resolution )
+    if v_mirror:
+        pos_px = h - 1 - pos_px
+    return pos_px
 
 
 def euler_from_quaternion(
