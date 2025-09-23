@@ -1,0 +1,6 @@
+/**:
+  ros__parameters:
+    nav_distance_tol: 0.35
+    nav_orientation_tol: 0.35
+    use_sim_time: False
+
