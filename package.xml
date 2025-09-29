@@ -3,7 +3,7 @@
 <package format="3">
   <name>navigation_server</name>
   <version>1.0.0</version>
-  <description>This package is a bridge between ROS 2 ecosystem and a REST API</description>
+  <description>This package is a bridge between ROS 2 ecosystem and the REST API</description>
   <maintainer email="cmauricioae8@gmail.com">C. Mauricio Arteaga-Escamilla</maintainer>
   <license>Apache License 2.0</license>
 

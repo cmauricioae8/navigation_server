@@ -3,17 +3,19 @@ import os
 import logging
 from unipath import Path
 from fastapi.templating import Jinja2Templates
+from ament_index_python import get_package_share_directory
 
-from .config import APP_DATA_DIR
+from .settings import PACKAGE_NAME, APP_DATA_DIR
 
 
 logger = logging.getLogger("dependencies")
 
-BASE_DIR = Path(__file__).ancestor(2)
-print(f"BASE_DIR: {BASE_DIR}")
+package_share_directory = get_package_share_directory(PACKAGE_NAME)
+print(f"SHARE_DIR: {package_share_directory}")
 
-static_dir = BASE_DIR.child("webapp").child("static")
-templates_dir = BASE_DIR.child("webapp").child("templates")
+
+static_dir = os.path.join(package_share_directory, 'navigation_server', 'webapp', 'static')
+templates_dir = os.path.join(package_share_directory, 'navigation_server', 'webapp', 'templates')
 media_dir = Path(APP_DATA_DIR).child("media")
 os.makedirs(media_dir, exist_ok=True) # create dir if not exists
 
