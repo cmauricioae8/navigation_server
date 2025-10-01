@@ -316,3 +316,9 @@ socketio.on('number_people_detected', function(data) {
   // console.log(data);
   number_people_detected_element.innerHTML = JSON.stringify(data, undefined, 2);
 });
+
+var notifications_element = document.getElementById('notifications');
+socketio.on('notifications', function(data) {
+  // console.log(data);
+  notifications_element.innerHTML = JSON.stringify(data, undefined, 2);
+});

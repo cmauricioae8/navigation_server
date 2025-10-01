@@ -22,4 +22,4 @@ class NotificationSubscriber(BaseSubscriber):
     def callback(self, msg: Log):
         message = msg.msg
         logger.warning(f"***** NOTIFICATIONS: {msg.level} - {msg.name} - {message}")
-        emitEvent("notifications", {"data": message})
+        emitEvent("notifications", {"msg": message})
