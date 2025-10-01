@@ -18,6 +18,9 @@ from navigation_server.topics.map_subscriber import MapSubscriber
 from navigation_server.topics.mode_status_publisher import ModeStatusPublisher
 from navigation_server.topics.notification_subscriber import NotificationSubscriber
 from navigation_server.topics.battery_subscriber import BatterySubscriber
+from navigation_server.topics.rotate2person_cmd_publisher import Rotate2PersonCmdPublisher
+from navigation_server.topics.n_people_tracked_subscriber import NoPeopleTrackedSubscriber
+
 
 from navigation_server.clients.navstack_client import NavStackClient
 from .utils import image_to_base64_str, from_m_to_px
@@ -107,6 +110,13 @@ class BaseNode(Node):
         )
         # ros2 topic pub --rate 5 /voltage std_msgs/msg/Float64 data:\ 24.1
 
+        self.rotate2person_cmd_publisher = Rotate2PersonCmdPublisher(
+            self, "/rotate_toward_person_command", "example_interface_msgs/Bool")
+        
+        self.n_people_tracked_subscriber = NoPeopleTrackedSubscriber(
+            self, "/number_people_tracked", "example_interface_msgs/Int16", -1)
+        # ros2 topic pub --once /number_people_tracked example_interfaces/msg/Int16 data:\ 2
+
         self.navstack_client = NavStackClient(self)
         self.stop_waypoints = []
 
@@ -118,6 +128,8 @@ class BaseNode(Node):
         ## ROS params declaration of base_node
         self.declare_parameter('nav_distance_tol', 0.25)
         self.declare_parameter('nav_orientation_tol', 0.3)
+        self.declare_parameter('action_in_paused', False)
+
 
         # Create service clients for getting and setting parameters
         self.octysafe_get_param_cli = self.create_client(GetParameters, '/octy_safe_motion/get_parameters')
@@ -154,6 +166,7 @@ class BaseNode(Node):
         self.notifications_subscriber.try_subscribe()
         self.battery_subscriber.try_subscribe()
         self.navstack_client.try_create_client()
+        self.n_people_tracked_subscriber.try_subscribe()
         self.logger.info("Topics initialized")
     
 

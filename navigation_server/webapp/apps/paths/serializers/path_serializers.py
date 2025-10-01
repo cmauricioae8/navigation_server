@@ -30,6 +30,7 @@ class StopWaypointSerializer(BaseModel):
 class PathSerializer(BaseModel):
     id: int
     name: str
+    description: str
     map: MapSimplestSerializer
     stop_waypoints: list[StopWaypointSerializer]
 
@@ -42,6 +43,7 @@ class PathSerializer(BaseModel):
         super().__init__(
             id=path.id,
             name=path.name,
+            description=path.description,
             map=MapSimplestSerializer(map) if map else None,
             stop_waypoints=stop_waypoints,
         )
@@ -58,6 +60,7 @@ class PathDetailResponseSerializer(DataResponse):
 class PathSimplestSerializer(BaseModel):
     id: int | None
     name: str
+    description: str
 
     def __init__(self, path: Path):
-        super().__init__(id=path.id, name=path.name)
+        super().__init__(id=path.id, name=path.name, description=path.description)

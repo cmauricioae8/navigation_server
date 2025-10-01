@@ -181,9 +181,19 @@ class NavigationManager:
                         self.message = "Navigation paused"
                         self.send_status_event()
                         base_node.logger.info("*Navigation*Navigation paused")
-                        # wait for resume navigation
+
+                        base_node.action_in_paused = base_node.get_parameter('action_in_paused').get_parameter_value().bool_value
+                        if base_node.action_in_paused:
+                            base_node.rotate2person_cmd_publisher.publish(True) # Activate node when paused
+                            base_node.logger.info("*Navigation*Action in paused initialized")
+                        
+                        # wait for resume navigation (blocking)
                         while self.paused_navigation and self.on_navigation:
                             time.sleep(2.0)
+                        
+                        if base_node.action_in_paused:
+                            base_node.rotate2person_cmd_publisher.publish(False) # Deactivate node
+                            base_node.logger.info("*Navigation*Action in paused finalized")
                         
                         logger.info("Navigation resumed (or cancelled)")
                         self.state = NavigationState.ACTIVE

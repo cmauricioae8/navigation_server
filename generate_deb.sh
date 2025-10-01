@@ -1,9 +1,15 @@
 #!/bin/bash
 
-#To run this script
-# $ bash generate_deb.sh
-# Important: For this project, any folder that contains python scripts, must have the '__init__.py'
-# file to be consider as a module.
+"""
+To run this script
+$ bash generate_deb.sh
+
+Important: For this project, any folder that contains python scripts, must have the '__init__.py'
+  file to be consider as a module.
+
+***** IT IS REQUIRED TO SET 'webapp/settings.py/DEBUGGING_MODE' VARIABLE TO False 
+  IN ORDER TO GENERATE THE CORRECT DEBIAN FILE ****
+"""
 
 #Sources:
 #https://docs.ros.org/en/humble/How-To-Guides/Building-a-Custom-Debian-Package.html

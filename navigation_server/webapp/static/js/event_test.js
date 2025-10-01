@@ -2,9 +2,6 @@ var toast_element = document.getElementById('toast_element');
 var toast_title = document.getElementById('toast_title');
 var toast_body = document.getElementById('toast_body');
 
-var notification_toast_element = document.getElementById('notification_toast_element');
-var notification_toast_title = document.getElementById('notification_toast_title');
-var notification_toast_body = document.getElementById('notification_toast_body');
 
 function send_message(message){
   console.log("Sending Message to server");
@@ -32,14 +29,6 @@ socketio.on("on_status_change", (msg) =>{
   var toast = new bootstrap.Toast(toast_element);
   toast.show();
 })
-socketio.on("notifications", (msg) => {
-  console.log("Notification:", msg.data);
-  notification_toast_title.innerHTML = msg.data.name;
-  notification_toast_body.innerHTML = `<b>${msg.data.type}</b>: ${msg.data.message}<br>`;
-  var notification_toast = new bootstrap.Toast(notification_toast_element);
-  notification_toast.show();
-})
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -319,4 +308,11 @@ socketio.on('on_moving', function(data) {
 socketio.on('on_mode_change', function(data) {
   //console.log(data);
   on_mode_change_element.innerHTML = `${data.mode}`;
+});
+
+
+var number_people_detected_element = document.getElementById('number_people_detected');
+socketio.on('number_people_detected', function(data) {
+  // console.log(data);
+  number_people_detected_element.innerHTML = JSON.stringify(data, undefined, 2);
 });

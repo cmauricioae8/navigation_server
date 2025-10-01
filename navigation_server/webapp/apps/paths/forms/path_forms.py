@@ -27,6 +27,10 @@ class PathCreateForm(BaseModel):
         unique=True,
         examples=["trayectoria 1", "trayectoria 2"],
     )
+    description: str = Field(
+        max_length=250,
+        examples=["trayectoria de prueba"],
+    )
     map: int = Field(
         description="Mapa al que pertenece el trayectoria",
         examples=[1, 2],

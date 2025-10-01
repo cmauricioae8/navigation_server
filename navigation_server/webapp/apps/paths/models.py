@@ -30,6 +30,7 @@ class StopWaypoint:
 
 class Path(BaseModel, table=True):
     name: str = Field(max_length=50)
+    description: str = Field(max_length=250)
     map_id: int = Field(foreign_key="map.id")
     stop_waypoints_json: list = Field(default=[], sa_column=Column(JSON))
 

@@ -83,6 +83,7 @@ def create_path(path_form: PathCreateForm):
     path = Path(
         name=path_form.name,
         map_id=path_form.map,
+        description=path_form.description,
         stop_waypoints_json=path_form.stop_waypoints_to_dict(),
     )
 

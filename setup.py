@@ -12,6 +12,7 @@ data_files_entries = [
     (os.path.join('share', package_name, 'launch'), glob('launch/*launch.[pxy]*')), # To add launch files
     (os.path.join('share', package_name, 'params'), glob('params/*.[yma]*')),
 
+    # For Debian pkg generation (DEBUGGING_MODE = False)
     (os.path.join('share', package_name, package_name, 'webapp', 'templates'), glob(package_name+'/webapp/templates/*.html')),
     (os.path.join('share', package_name, package_name, 'webapp', 'templates','home'), glob(package_name+'/webapp/templates/home/*.html')),
     
