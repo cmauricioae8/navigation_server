@@ -37,6 +37,9 @@ colcon build --packages-select navigation_server --symlink-install --allow-overr
 source install/setup.bash
 ```
 
+In order to work with the sqlite database file, it is recommended to install 'sqlitebrowser', with `sudo apt install sqlitebrowser`.
+
+
 ## Usage
 
 After of above configurations, run the project with default ros params:

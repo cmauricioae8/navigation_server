@@ -307,9 +307,9 @@ class NavigationManager:
 
             wp_name = self.next_stop_waypoint.waypoint.name
 
-            if self.nav_distance_error is not None:
-                base_node.logger.warning("<<<<<<<<< Nav feedback can be used <<<<<<<<<<")
-                base_node.logger.info(f"{self.nav_distance_error=}, {self.nav_orientation_error=}")
+            # if self.nav_distance_error is not None:
+            #     base_node.logger.warning("<<<<<<<<< Nav feedback can be used <<<<<<<<<<")
+            #     base_node.logger.info(f"{self.nav_distance_error=}, {self.nav_orientation_error=}")
 
             ## DISTANCE AND ORIENTATION ARE VALIDATED
             if ( self.nav_distance_error < base_node.nav_distance_tol 

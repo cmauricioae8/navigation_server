@@ -166,6 +166,7 @@ class BaseNode(Node):
         self.notifications_subscriber.try_subscribe()
         self.battery_subscriber.try_subscribe()
         self.navstack_client.try_create_client()
+        self.rotate2person_cmd_publisher.try_create_publisher()
         self.n_people_tracked_subscriber.try_subscribe()
         self.logger.info("Topics initialized")
     
