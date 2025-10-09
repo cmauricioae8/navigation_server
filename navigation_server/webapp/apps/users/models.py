@@ -26,3 +26,10 @@ class User(BaseModel, table=True):
     def verify_password(self, plain_password: str) -> bool:
         """Verify the password."""
         return pwd_context.verify(plain_password, self.password)
+    
+
+class UserLogin(BaseModel, table=True):
+    """Model definition for User when login from front App."""
+    
+    Nombre: str = Field(title="Nombre de usuario", max_length=100)
+    Password: str = Field(title="Contraseña", max_length=100)

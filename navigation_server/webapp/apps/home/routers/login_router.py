@@ -10,7 +10,7 @@ from fastapi_login import LoginManager
 
 from navigation_server.webapp.dependencies import NotAuthenticatedException, templates
 from navigation_server.webapp.apps.users.cruds.user_cruds import user_crud
-from navigation_server.webapp.apps.users.models import User
+from navigation_server.webapp.apps.users.models import User, UserLogin
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ router = APIRouter()
 
 login_manager = LoginManager(
     "6558c21a0068b9a84411f5037dcb76a422c0e73aad5a96bba92ded0d9bd5583f",
-    "/login",
+    "/login_manager",
     use_cookie=True,
     use_header=False,
     default_expiry=timedelta(hours=12),
@@ -27,7 +27,7 @@ login_manager = LoginManager(
 )
 
 
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/login_manager", response_class=HTMLResponse)
 async def get_login(
     request: Request, message_color: str = None, message_title: str = None
 ):
@@ -41,7 +41,7 @@ async def get_login(
     )
 
 
-@router.post("/login")
+@router.post("/login_manager")
 async def post_login(data: OAuth2PasswordRequestForm = Depends()):
     username = data.username
     plain_password = data.password
@@ -50,12 +50,12 @@ async def post_login(data: OAuth2PasswordRequestForm = Depends()):
 
     if user is None:
         return RedirectResponse(
-            "/login?message_color=danger&message_title=Usuario no registrado",
+            "/login_manager?message_color=danger&message_title=Usuario no registrado",
             status_code=status.HTTP_303_SEE_OTHER,
         )
     elif not user.verify_password(plain_password):
         return RedirectResponse(
-            "/login?message_color=warning&message_title=Contraseña incorrecta",
+            "/login_manager?message_color=warning&message_title=Contraseña incorrecta",
             status_code=status.HTTP_303_SEE_OTHER,
         )
 
@@ -66,8 +66,31 @@ async def post_login(data: OAuth2PasswordRequestForm = Depends()):
     return response  # return {'access_token': token}
 
 
-@router.get("/logout")
+
+@router.post("/login")
+async def post_login(data: UserLogin):
+    username = data.Nombre
+    plain_password = data.Password
+
+    user: User = user_crud.get_by_field("username", username)
+
+    if user is None:
+        return {"Status": False, "Description": "Usuario incorrecto."}
+    elif not user.verify_password(plain_password):
+        return {"Status": False, "Description": "Contraseña incorrecta."}
+
+    token = login_manager.create_access_token(data={"sub": username})
+    logger.warning(f"User {username} logged in, with token {token}")
+    return {'Status': True, "token": token}
+
+
+@router.get("/logout_manager")
 async def get_logout(request: Request):
-    response = RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+    response = RedirectResponse("/login_manager", status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(key="access-token")
     return response
+
+
+@router.delete("/logout")
+async def get_logout():
+    return {"status": True, "descripcion": "Sesion expirada."}

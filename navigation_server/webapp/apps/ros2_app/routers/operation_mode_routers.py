@@ -45,7 +45,7 @@ def set_operation_mode(form_data: OperationModeRequestForm):
     Set operation mode
 
     Set the operation mode in the robot. The mode can be: static, teleoperation,
-    mapping, waypoint and navigation (with keepout and speed maps).
+    mapping, waypoints and navigation (with keepout and speed maps).
     """
 
     status, response = mode_manager.set_mode(

@@ -12,7 +12,7 @@ from navigation_server.webapp.apps.ros2_app.urls import router as ros2_router
 
 router = APIRouter()
 
-router.include_router(home_router, prefix="", include_in_schema=False)
+router.include_router(home_router, prefix="") #include_in_schema=False
 router.include_router(user_routers, prefix="/users", tags=["Usuarios"])
 router.include_router(map_router, prefix="/maps")
 router.include_router(waypoints_router, prefix="/waypoints")

@@ -55,7 +55,7 @@ def main(args=None):
     async def cmd_vel(sid, data):
         linear_x = float(data["linear_x"])
         angular_z = float(data["angular_z"])
-        base_node.logger.info("robot_move \tx:{:2.2f}, \tz:{:2.2f}".format(linear_x, angular_z ))
+        # base_node.logger.info("robot_move \tx:{:2.2f}, \tz:{:2.2f}".format(linear_x, angular_z ))
         base_node.cmd_vel_publisher.publish(linear_x, angular_z)
     
 

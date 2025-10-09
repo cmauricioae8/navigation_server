@@ -52,7 +52,7 @@ def set_navigation(form_data: NavigationRequestForm):
     """
     Navigation request
 
-    Set the navigation mode and path. Also can stop, pause, resume or cancel the
+    Set the navigation mode and path. Also can loop, stop, pause, resume or cancel the
     current navigation.
     """
 

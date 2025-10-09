@@ -99,5 +99,5 @@ app.add_websocket_route("/socket.io/", sio_asgi_app)
 
 @app.exception_handler(NotAuthenticatedException)
 def auth_exception_handler(request: Request, exc: NotAuthenticatedException):
-    return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse("/login_manager", status_code=status.HTTP_303_SEE_OTHER)
 

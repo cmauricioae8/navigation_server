@@ -112,6 +112,7 @@ class BaseNode(Node):
 
         self.rotate2person_cmd_publisher = Rotate2PersonCmdPublisher(
             self, "/rotate_toward_person_command", "example_interface_msgs/Bool")
+        # ros2 topic pub --once /rotate_toward_person_command example_interfaces/msg/Bool data:\ True
         
         self.n_people_tracked_subscriber = NoPeopleTrackedSubscriber(
             self, "/number_people_tracked", "example_interface_msgs/Int16", -1)
