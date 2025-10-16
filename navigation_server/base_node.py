@@ -217,7 +217,7 @@ class BaseNode(Node):
                     cv.line(base_map_img, (pixel_x, pixel_y), (pixel_xf, pixel_yf), (0,0,235), 3)
 
                 #Add LiDAR data
-                if self.scan_subscriber.scan_available:
+                if self.scan_subscriber.scan_available and orientation is not None:
                     for p in self.scan_subscriber.scan_data.points:
                         #Compensate robot orientation
                         pr_x = p.x * cos(orientation) - p.y * sin(orientation)

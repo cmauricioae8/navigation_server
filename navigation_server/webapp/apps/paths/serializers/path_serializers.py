@@ -60,7 +60,7 @@ class PathDetailResponseSerializer(DataResponse):
 class PathSimplestSerializer(BaseModel):
     id: int | None
     name: str
-    description: str
+    description: str | None = None
 
     def __init__(self, path: Path):
         super().__init__(id=path.id, name=path.name, description=path.description)
