@@ -37,6 +37,9 @@ class ModeManager(threading.Thread):
         self.last_mode_pose: RobotPoseData = None
         self.currently_changing_mode = False
 
+        self.reset_odom_cmd = ' '.join(['ros2','service','call',\
+                    '/reset_odometry','std_srvs/srv/Trigger','{}'])
+
         self.daemon = True
 
     def set_mode(
@@ -68,7 +71,7 @@ class ModeManager(threading.Thread):
                 f"map_id: {self.map_id}, map name: {self.map_name}"
             )
         )
-
+        
         if not self.mode_ready and self.currently_changing_mode:
             return (
                 False,
@@ -343,7 +346,12 @@ class ModeManager(threading.Thread):
 
             # restore last pose
             if self.desired_mode == OperationMode.MAPPING:
-                base_node.logger.info("NO SET POSE ON MAPPING")
+                base_node.logger.info("NO SET POSE ON MAPPING")               
+
+                # Call /reset_odometry service from terminal
+                p = subprocess.Popen(self.reset_odom_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+                stdoutdata, stderrdata = p.communicate()  #this is blocking
+                base_node.logger.info("Odometry was reset for mapping")
             elif (
                 settings.POSE_TO_SET == self.SET_LAST_MODE_POSE
                 and self.last_mode_pose is not None

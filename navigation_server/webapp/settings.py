@@ -9,7 +9,14 @@ logger = logging.getLogger(__name__)
 PACKAGE_NAME = "navigation_server"
 APP_DATA_DIR = os.path.join(os.path.expanduser("~"), f".{PACKAGE_NAME}")
 
-DEBUGGING_MODE = False # --------- SET TO False TO GENERATE THE DEBIAN PKG ---
+
+DEBUGGING_MODE = True # --------- SET TO False TO GENERATE THE DEBIAN PKG ---
+
+if DEBUGGING_MODE:
+    logger.warning(f"\x1B[1;33m---------*** Running on DEBUG mode ***---------\x1B[0m")
+else:
+    logger.warning(f"\x1B[1;36m---------*** Running on RELEASE mode ***---------\x1B[0m")
+
 
 class OperationMode(Enum):
     STOP = "stop", "Detenido"
@@ -198,7 +205,6 @@ class Settings:
                 " speed_mask:={MAP_FILE}"
             ]
         )
-        # self.NAVIGATION_MANAGER: NavigationManager = NavigationManager()
 
         self.load()
 
@@ -220,11 +226,6 @@ class Settings:
             if "SPEED_LIMITS_PROCESS" in data
             else Process()
         )
-        # self.NAVIGATION_MANAGER = (
-        #     NavigationManager.from_dict(data["NAVIGATION_MANAGER"])
-        #     if "NAVIGATION_MANAGER" in data
-        #     else NavigationManager()
-        # )
 
     def to_dict(self):
         data = self.__dict__.copy()
@@ -232,7 +233,6 @@ class Settings:
         data["MAP"] = self.MAP.to_dict()
         data["KEEPOUT_ZONES_PROCESS"] = self.KEEPOUT_ZONES_PROCESS.to_dict()
         data["SPEED_LIMITS_PROCESS"] = self.SPEED_LIMITS_PROCESS.to_dict()
-        # data["NAVIGATION_MANAGER"] = self.NAVIGATION_MANAGER.to_dict()
         return data
 
     def save(self):

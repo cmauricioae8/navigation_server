@@ -102,10 +102,10 @@ class BaseNode(Node):
             "/voltage",
             "std_msgs/Float64",
             10.0,
-            95.0,
+            98.0,
             20.0,
-            20.0,
-            25.0,
+            22.5,
+            29.5,
             1
         )
         # ros2 topic pub --rate 5 /voltage std_msgs/msg/Float64 data:\ 24.1
