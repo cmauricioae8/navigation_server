@@ -6,7 +6,7 @@ from sensor_msgs.msg import LaserScan
 
 from .base_topics import BaseSubscriber
 from navigation_server.topics.data_types import PointData
-from navigation_server.webapp.socket_io import emitEvent
+# from navigation_server.webapp.socket_io import emitEvent
 
 
 class ScanData:

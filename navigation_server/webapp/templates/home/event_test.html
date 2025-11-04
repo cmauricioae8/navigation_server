@@ -137,31 +137,6 @@
         </div>
         <!-- --------------------------------------------------- -->
     </div>
-    <div class="col-4">
-        <!-- ------------ EVENTO: scan ------------ -->
-        <div class="card m-2" >
-            <div class="card-header">
-                <h5 class="card-title">Event: scan</h5>
-            </div>
-            <div class="card-body">
-                <p>Datos: <span id="scan"></span></p>
-            </div>
-        </div>
-        <!-- --------------------------------------------------- -->
-    </div>
-
-    <div class="col-4">
-        <!-- ------------ EVENTO: path_plan ------------ -->
-        <div class="card m-2" >
-            <div class="card-header">
-                <h5 class="card-title">Event: path_plan</h5>
-            </div>
-            <div class="card-body">
-                <p>Datos: <span id="path_plan"></span></p>
-            </div>
-        </div>
-        <!-- --------------------------------------------------- -->
-    </div>
 
     <div class="col-4">
         <!-- ------------ EVENTO: on_moving ------------ -->
@@ -216,6 +191,23 @@
             <div class="card-body">
             <p class="card-text"><pre id="notifications"></pre> </p>
 
+            </div>
+        </div>
+        <!-- --------------------------------------------------- -->
+    </div>
+
+    <div class="col-12">
+        <!-- ------------ Set initial pose ------------ -->
+        <div class="card m-2" >
+            <div class="card-header">
+                <h5 class="card-title">Set Initial Pose (x,y,th)</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="card-text">Robot pose [m, rad]</p>
+                <input type="text" class="text" id="pose_x0" value="0.0">
+                <input type="text" class="text" id="pose_y0" value="0.0">
+                <input type="text" class="text" id="pose_th0" value="0.0">
+                <button id="set_initialpose" class="btn btn-warning">Publish pose</button>
             </div>
         </div>
         <!-- --------------------------------------------------- -->

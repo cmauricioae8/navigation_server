@@ -54,21 +54,10 @@ var button_cmd_right = document.getElementById("cmd_right");
 var button_cmd_stop = document.getElementById("cmd_stop");
 
 var position_element = document.getElementById('position');
-var scan_element = document.getElementById('scan');
-var path_plan_element = document.getElementById('path_plan');
 var on_moving_element = document.getElementById('on_moving');
 var on_mode_change_element = document.getElementById('on_mode_change');
 
-// ELEMENTS FOR SET POSE
-// var button_pose_set = document.getElementById("pose_set");
-// var pose_position_x = document.getElementById("pose_position_x");
-// var pose_position_y = document.getElementById("pose_position_y");
-// var pose_orientation = document.getElementById("pose_orientation");
-
 // ELEMENTS FOR BATTERY
-var button_battery_get = document.getElementById("battery_get");
-var button_battery_stop = document.getElementById("battery_stop");
-var battery_as_event_checkbox = document.getElementById("battery_as_event_checkbox");
 var battery_voltage = document.getElementById("battery_voltage");
 var battery_percentage = document.getElementById("battery_percentage");
 
@@ -280,27 +269,6 @@ socketio.on('robot_pose', function(data) {
   //console.log(data);
   position_element.innerHTML = `(${data.position_x.toFixed(2)}, ${data.position_y.toFixed(2)}, ${data.orientation.toFixed(2)})`;
 });
-socketio.on('scan', function(data) {
-  //console.log(data);
-  // print first 5 points
-  var scan_text = `min_dist: ${data.min_distance.toFixed(2)}m to ${data.min_angle}°<br>`;
-  var n = 5 < data.length ? 5 : data.length;
-  for (var i = 0; i < n; i++) {
-    scan_text += `(${data.points[i].x}, ${data.points[i].y})<br>`;
-  }
-  
-  scan_element.innerHTML = `(${data.length})<br>` + scan_text;
-});
-socketio.on('path_plan', function(data) {
-  //console.log('path_plan', data);
-  // print first 5 poses
-  var path_text = "";
-  var n = 5 < data.length ? 5 : data.length;
-  for (var i = 0; i < n; i++) {
-    path_text += `(${data.poses[i].position_x}, ${data.poses[i].position_y}, ${data.poses[i].orientation})<br>`;
-  }
-  path_plan_element.innerHTML = `(${data.length})<br>` + path_text;
-});
 socketio.on('on_moving', function(data) {
   //console.log(data);
   on_moving_element.innerHTML = `on_moving: ${data.on_moving}`;
@@ -322,3 +290,31 @@ socketio.on('notifications', function(data) {
   // console.log(data);
   notifications_element.innerHTML = JSON.stringify(data, undefined, 2);
 });
+
+
+// Set Initial Pose
+var button_pose_set = document.getElementById("set_initialpose");
+button_pose_set.addEventListener("click", function(){
+  // console.log("Publish initial pose");
+  data = {
+    position_x: document.getElementById('pose_x0').value,
+    position_y: document.getElementById('pose_y0').value,
+    orientation: document.getElementById('pose_th0').value,
+  };
+  $.ajax(
+      {
+        url: document.location.origin+"/ros/set_pose/free/",
+        type: "POST",
+        //traditional:true,
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(data),
+        success: function(data){
+            console.log("Set initial pose success");
+        }
+  });
+});
+
+
