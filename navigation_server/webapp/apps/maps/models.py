@@ -32,26 +32,6 @@ class Map(BaseModel, table=True):
         img = imread(join(APP_DATA_DIR, "media/", self.pgm_path), cv.IMREAD_GRAYSCALE)
         return image_to_base64_str(img)
 
-    # def to_base64_original(self) -> str:
-    #     img = imread(
-    #         join(APP_DATA_DIR, "media/", self.pgm_original_path), cv.IMREAD_GRAYSCALE
-    #     )
-    #     return map_png_to_base64_str(img)
-
-    # def restore_from_original(self) -> None:
-    #     print("Restoring from original")
-    #     img = imread(
-    #         join(APP_DATA_DIR, "media/", self.pgm_original_path), cv.IMREAD_GRAYSCALE
-    #     )
-    #     imwrite(join(APP_DATA_DIR, "media/", self.pgm_path), img)
-
-    # def insert_cleaned_map(self, cleaned_map_str: str) -> None:
-    #     cleaned_map = image_base64_to_bytes(cleaned_map_str)
-    #     cleaned_map = cv.imdecode(
-    #         np.frombuffer(cleaned_map, np.uint8), cv.IMREAD_GRAYSCALE
-    #     )
-    #     imwrite(join(APP_DATA_DIR, "media/", self.pgm_path), cleaned_map)
-
     def generate_files_with_keepout_zones(self) -> None:
         print(f"Generating files with keepout zones for {self.name}")
         img = imread(join(APP_DATA_DIR, "media/", self.pgm_path))
@@ -73,8 +53,6 @@ class Map(BaseModel, table=True):
         with open(join(APP_DATA_DIR, "media/", new_yaml_file_path), "w") as f:
             yaml.dump(yaml_data, f, Dumper=IndentDumper, sort_keys=False)
 
-        # self.pgm_keepout_zones_path = new_pgm_file_path
-        # self.yaml_keepout_zones_path = new_yaml_file_path
         self.save()
 
     def generate_files_with_speed_limits(self) -> None:
@@ -100,8 +78,6 @@ class Map(BaseModel, table=True):
         with open(join(APP_DATA_DIR, "media/", new_yaml_file_path), "w") as f:
             yaml.dump(yaml_data, f, Dumper=IndentDumper, sort_keys=False)
 
-        # self.pgm_speed_limits_path = new_pgm_file_path
-        # self.yaml_speed_limits_path = new_yaml_file_path
         self.save()
 
     def delete(self) -> None:
@@ -115,16 +91,6 @@ class Map(BaseModel, table=True):
         ]
         for file in map_files:
             try_delete_media_file(file)
-
-        # try_delete_media_file(self.yaml_path)
-        # if self.pgm_original_path:
-        #     try_delete_media_file(self.pgm_original_path)
-        # if self.pgm_keepout_zones_path:
-        #     try_delete_media_file(self.pgm_keepout_zones_path)
-        #     try_delete_media_file(self.yaml_keepout_zones_path)
-        # if self.pgm_speed_limits_path:
-        #     try_delete_media_file(self.pgm_speed_limits_path)
-        #     try_delete_media_file(self.yaml_speed_limits_path)
 
         return super().delete()
 

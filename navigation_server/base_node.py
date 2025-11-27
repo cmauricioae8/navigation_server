@@ -143,6 +143,7 @@ class BaseNode(Node):
         self.octysafe_params = dict.fromkeys(self.octysafe_get_request.names, default_double_value)
 
         self.octysafe_set_request = SetParameters.Request()
+        self.octysafe_params_available = False
         
 
         self.logger.info("... BaseNode initialized")
@@ -201,7 +202,7 @@ class BaseNode(Node):
                         cv.line(base_map_img, (px_x, px_y), (pxf_x, pxf_y), (0,200,0), 1)
                 
                 #Add robot
-                orientation = 0.0
+                pos_x, pos_y, orientation = 0.0, 0.0, 0.0
                 if self.amcl_pose_subscriber.pose_available:
                     pos_x = self.amcl_pose_subscriber.pose_data.position_x
                     pos_y = self.amcl_pose_subscriber.pose_data.position_y

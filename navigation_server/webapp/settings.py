@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 PACKAGE_NAME = "navigation_server"
 APP_DATA_DIR = os.path.join(os.path.expanduser("~"), f".{PACKAGE_NAME}")
+SERVER_NODE_NAME = "server_node"
 
 
 DEBUGGING_MODE = True # --------- SET TO False TO GENERATE THE DEBIAN PKG ---

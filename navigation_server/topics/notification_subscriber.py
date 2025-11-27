@@ -22,4 +22,49 @@ class NotificationSubscriber(BaseSubscriber):
     def callback(self, msg: Log):
         message = msg.msg
         logger.warning(f"***** NOTIFICATIONS: {msg.level} - {msg.name} - {message}")
+
         emitEvent("notifications", {"msg": message})
+
+        ## Filter notifications for robot status
+        notifications_dict = {}
+
+        ## LiDAR
+        if message.find('SEN-LID-1-104') != -1:
+            notifications_dict['source'] = "lidar"
+            notifications_dict['status'] = "FAIL"
+            notifications_dict['msg'] = "No hay datos del LiDAR"
+        if message.find('SEN-LID-0-0') != -1:
+            notifications_dict['source'] = "lidar"
+            notifications_dict['status'] = "OK"
+            notifications_dict['msg'] = "LiDAR funcionando"
+        
+        ## Wheels
+        # if message.find('COM-RUE-1-C204') != -1 or message.find('COM-RUE-2-C204'):
+        #     notifications_dict['source'] = "wheels"
+        #     notifications_dict['status'] = "FAIL"
+        #     notifications_dict['msg'] = "No hay datos de las ruedas ruedas"
+        # if message.find('COM-RUE-0-0') != -1:
+        #     notifications_dict['source'] = "wheels"
+        #     notifications_dict['status'] = "OK"
+        #     notifications_dict['msg'] = "Ruedas funcionando"
+        
+        ## Blocking
+        if message.find('+LDR_F') != -1:
+            notifications_dict['source'] = "block"
+            notifications_dict['status'] = "FAIL"
+            notifications_dict['msg'] = "Espacio frontal obstruido"
+        if message.find('-LDR_F')!= -1:
+            notifications_dict['source'] = "block"
+            notifications_dict['status'] = "OK"
+            notifications_dict['msg'] = "Espacio frontal libre"
+        
+        if message.find('+LDR_L') != -1:
+            notifications_dict['source'] = "block"
+            notifications_dict['status'] = "FAIL"
+            notifications_dict['msg'] = "Espacio lateral obstruido"
+        if message.find('-LDR_L')!= -1:
+            notifications_dict['source'] = "block"
+            notifications_dict['status'] = "OK"
+            notifications_dict['msg'] = "Espacio lateral libre"
+
+        emitEvent("notifications", notifications_dict)

@@ -1,11 +1,8 @@
 
-from os import path, makedirs
-import yaml
 import logging
 from datetime import datetime
 from pydantic import BaseModel, Field
 
-from navigation_server.webapp.settings import APP_DATA_DIR
 from navigation_server.utils import EnumWithDescription
 
 logger = logging.getLogger(__name__)
@@ -69,6 +66,9 @@ class SimpleResponse(BaseModel):
     status: str = Field(examples=["OK", "FAIL"])
     message: str = Field(examples=["Operation successful", "Operation failed"])
 
+class SimpleResponseList(BaseModel):
+    status: str = Field(examples=["OK", "FAIL"])
+    message: list = Field(examples=["string 1", "String 2"])
 
 class DataResponse(BaseModel):
     status: str = Field(examples=["OK", "FAIL"])
@@ -103,71 +103,3 @@ class DataWithPagination(BaseModel):
     records_count: int = Field(examples=[100])
     records: list = Field(examples=[[]])
 
-"""
-class SettingSerializer(BaseSerializer):
-    settings_name: str = "settings"
-    last_updated: str = ""
-
-    def load(self):
-        # load settings from ~/.datia_demographics/settings/{settings_name}.yaml
-        # create the directory if it does not exist
-        if not path.exists(path.join(APP_DATA_DIR, "settings")):
-            makedirs(path.join(APP_DATA_DIR, "settings"))
-        try:
-            with open(
-                path.join(APP_DATA_DIR, f"settings/{self.settings_name}.yaml"), "r"
-            ) as f:
-                data = yaml.safe_load(f)
-                self.set_from_dict(data)
-                logger.info(f"{self.settings_name} settings loaded")
-        except FileNotFoundError:
-            logger.error(
-                f"{self.settings_name} settings file not found, using default values"
-            )
-            self.save()
-
-    def save(self):
-        self.last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # save settings to ~/.datia_demographics/settings/{settings_name}.yaml
-        with open(
-            path.join(APP_DATA_DIR, f"settings/{self.settings_name}.yaml"), "w"
-        ) as f:
-            data = self.get_dict(self)
-            yaml.dump(data, f, sort_keys=False)
-        logger.info(f"{self.settings_name} settings saved")
-
-
-class RosParamsSerializer(BaseSerializer):
-    ros_package: str = "ros_package"
-    node_name: str = "node"
-    last_updated: str = ""
-
-    def load(self):
-        # load params from ~/.{ros_package}/{node_name}_params.yaml
-        params_path = path.join(path.expanduser("~"), "." + self.ros_package)
-        # create the directory if it does not exist
-        if not path.exists(params_path):
-            makedirs(params_path)
-        try:
-            with open(
-                path.join(params_path, self.node_name + "_params.yaml"), "r"
-            ) as f:
-                data = yaml.safe_load(f)
-                data = data.get("/**", {}).get("ros__parameters", {})
-                self.set_from_dict(data)
-                logger.info(f"{self.node_name} params loaded")
-        except FileNotFoundError:
-            logger.error(
-                f"{self.node_name} params file not found, using default values"
-            )
-            self.save()
-
-    def save(self):
-        self.last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # save params to ~/.{ros_package}/{node_name}_params.yaml
-        params_path = path.join(path.expanduser("~"), "." + self.ros_package)
-        with open(path.join(params_path, self.node_name + "_params.yaml"), "w") as f:
-            data = self.get_dict(self)
-            yaml.dump({"/**": {"ros__parameters": data}}, f, sort_keys=False)
-        logger.info(f"{self.node_name} params saved")
-"""
