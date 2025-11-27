@@ -4,8 +4,6 @@ from math import cos, sin
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
-from rcl_interfaces.srv import GetParameters, SetParameters
-# from rcl_interfaces.msg import Parameter
 
 from navigation_server.webapp.socket_io import emitEvent
 
@@ -89,11 +87,9 @@ class BaseNode(Node):
             event_name="costmap",
         )
 
-        self.mode_status_publisher = ModeStatusPublisher(
-            self, "/mode_status", "std_msgs/String"
-        )
+        self.mode_status_publisher = ModeStatusPublisher( self, "/mode_status", "std_msgs/String" )
 
-        self.notifications_subscriber = NotificationSubscriber(
+        self.notifications_subscriber = NotificationSubscriber( 
             self, "/notifications", "rcl_interfaces/Log", -1
         )
 
@@ -130,20 +126,6 @@ class BaseNode(Node):
         self.declare_parameter('nav_distance_tol', 0.25)
         self.declare_parameter('nav_orientation_tol', 0.3)
         self.declare_parameter('action_in_paused', False)
-
-
-        # Create service clients for getting and setting parameters
-        self.octysafe_get_param_cli = self.create_client(GetParameters, '/octy_safe_motion/get_parameters')
-        self.octysafe_set_param_cli = self.create_client(SetParameters, '/octy_safe_motion/set_parameters')
-
-        ## List of ROS params to be tracked
-        self.octysafe_get_request = GetParameters.Request()
-        default_double_value = 0.0
-        self.octysafe_get_request.names = ['max_vel_x','min_vel_x','max_vel_theta','manual_vel_gain']
-        self.octysafe_params = dict.fromkeys(self.octysafe_get_request.names, default_double_value)
-
-        self.octysafe_set_request = SetParameters.Request()
-        self.octysafe_params_available = False
         
 
         self.logger.info("... BaseNode initialized")
@@ -233,30 +215,6 @@ class BaseNode(Node):
 
                 maplayers_dict = {"data": {"image": image_to_base64_str(base_map_img)}}
                 emitEvent("maplayers", maplayers_dict)
-
-
-    def octysafe_get_params(self):
-        if not self.octysafe_get_param_cli.wait_for_service(timeout_sec=1.0):
-            return False
-        
-        future = self.octysafe_get_param_cli.call_async(self.octysafe_get_request)
-        rclpy.spin_until_future_complete(self, future)
-
-        if future.result(): #1=bool, 2=integer, 4=string
-            for i, param_value in enumerate(future.result().values):
-                if param_value.type == 3:
-                    double_param = param_value.double_value
-                    parameter_name = self.octysafe_get_request.names[i]
-                    self.octysafe_params[parameter_name] = double_param # update dict
-        else:
-            self.logger().error('Failed to call octy_safe_motion get_parameters service')
-            return False
-        
-        return True
-    
-
-    def octysafe_set_params(self):
-        pass
 
 
 base_node = BaseNode()

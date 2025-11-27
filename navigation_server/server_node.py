@@ -47,7 +47,6 @@ def main(args=None):
 
 
     base_node.init_topics()
-    base_node.octysafe_params_available = base_node.octysafe_get_params() # Get octy_safe_motion ros params ------
     mode_manager.start()
 
     # register sio events

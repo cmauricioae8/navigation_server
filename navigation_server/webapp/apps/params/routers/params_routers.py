@@ -21,7 +21,7 @@ router = APIRouter()
     status_code=status.HTTP_200_OK,
     summary="Get ROS Parameters of robot",
 )
-def get_robot_params():
+async def get_robot_params():
     """
     Get ROS Parameters of robot that user can modified.
     """
@@ -76,7 +76,7 @@ def get_robot_params():
     status_code=status.HTTP_200_OK,
     summary="Get ROS Parameters of sensors protection",
 )
-def get_sensor_protect():
+async def get_sensor_protect():
     """
     Get ROS Parameters of sensors protection that user can modified.
     """
@@ -117,7 +117,7 @@ def get_sensor_protect():
     status_code=status.HTTP_200_OK,
     summary="Get ROS Parameters of navigation manager",
 )
-def get_nav_manager():
+async def get_nav_manager():
     """
     Get ROS Parameters of navigation manager that user can modified.
     """
@@ -169,7 +169,7 @@ def run_command(param_name: str, param_value: str, node_name = "/octy_safe_motio
     status_code=status.HTTP_200_OK,
     summary="Set ROS Parameters of robot",
 )
-def set_robot_params(robot_param: SetRobotParamsForm):
+async def set_robot_params(robot_param: SetRobotParamsForm):
     """
     Set ROS Parameters of robot that user can modified.
     """
@@ -205,7 +205,7 @@ def set_robot_params(robot_param: SetRobotParamsForm):
     status_code=status.HTTP_200_OK,
     summary="Set ROS Parameters of sensor protection",
 )
-def set_sensor_protect(sensor_protect: SetSensorProtectForm):
+async def set_sensor_protect(sensor_protect: SetSensorProtectForm):
     """
     Set ROS Parameters of sensor protection that user can modified.
     """
@@ -241,7 +241,7 @@ def set_sensor_protect(sensor_protect: SetSensorProtectForm):
     status_code=status.HTTP_200_OK,
     summary="Set ROS Parameters of navigation manager",
 )
-def set_nav_manager(nav_man_params: SetNavParamsForm):
+async def set_nav_manager(nav_man_params: SetNavParamsForm):
     """
     Set ROS Parameters of navigation manager that user can modified.
     """

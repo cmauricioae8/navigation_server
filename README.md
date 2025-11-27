@@ -66,7 +66,7 @@ ros2 launch navigation_server navigation_server
 In order to test this backend without requiring either the simulator or the actual robot, run the ros bag in loop mode:
 
 ```bash
-ros2 bag play -l ~/colcon_ws/src/navigation_server/test/nav_mode/
+ros2 bag play -l ~/colcon_ws/src/navigation_server/test/nav_mode/nav_mode_0.db3
 ```
 
 

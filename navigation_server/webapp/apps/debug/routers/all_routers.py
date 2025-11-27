@@ -2,9 +2,9 @@
 
 from typing import Union
 from fastapi import APIRouter, status
-import  subprocess, re
+import subprocess, re
 
-from navigation_server.webapp.apps.base.serializers import SimpleResponse, SimpleResponseList
+from navigation_server.webapp.apps.base.serializers import SimpleResponse, SimpleResponseList, DataResponse
 
 
 router = APIRouter()
@@ -134,3 +134,29 @@ def ros_node_list():
         return SimpleResponse(status="OK", message=ret_cmd_rt.stdout)
 
 
+@router.get(
+    "/robot/network/",
+    response_model=DataResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Robot Network Information",
+)
+def get_network_info():
+    """
+    Get robot network information.
+    """
+
+    network_info = {"name": ""}
+    try:
+        output0 = subprocess.check_output(['iwgetid']).decode()
+        output1 = output0.split()[1]
+        output = output1.replace("ESSID:","")
+        # print("Connected Wifi SSID: " + output)
+        output_status = "OK"
+        output_msg = "Operation successful"
+        network_info["name"] = output
+    except:
+        output_status = "FAIL"
+        output_msg = "Operation failed"
+        network_info["name"] = "?"
+    
+    return DataResponse(status=output_status, message=output_msg, data=network_info)

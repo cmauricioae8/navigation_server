@@ -93,4 +93,4 @@ async def get_logout(request: Request):
 
 @router.delete("/logout")
 async def get_logout():
-    return {"status": True, "descripcion": "Sesion expirada."}
+    return {"status": True, "Description": "Sesion expirada."}
