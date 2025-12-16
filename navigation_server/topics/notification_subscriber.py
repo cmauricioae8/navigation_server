@@ -39,14 +39,14 @@ class NotificationSubscriber(BaseSubscriber):
             notifications_dict['msg'] = "LiDAR funcionando"
         
         ## Wheels
-        # if message.find('COM-RUE-1-C204') != -1 or message.find('COM-RUE-2-C204'):
-        #     notifications_dict['source'] = "wheels"
-        #     notifications_dict['status'] = "FAIL"
-        #     notifications_dict['msg'] = "No hay datos de las ruedas ruedas"
-        # if message.find('COM-RUE-0-0') != -1:
-        #     notifications_dict['source'] = "wheels"
-        #     notifications_dict['status'] = "OK"
-        #     notifications_dict['msg'] = "Ruedas funcionando"
+        if message.find('COM-RUE-1-C204') != -1 or message.find('COM-RUE-2-C204'):
+            notifications_dict['source'] = "wheels"
+            notifications_dict['status'] = "FAIL"
+            notifications_dict['msg'] = "No hay datos de las ruedas ruedas"
+        if message.find('COM-RUE-0-0') != -1:
+            notifications_dict['source'] = "wheels"
+            notifications_dict['status'] = "OK"
+            notifications_dict['msg'] = "Ruedas funcionando"
         
         ## Blocking
         if message.find('+LDR_F') != -1:
@@ -68,3 +68,4 @@ class NotificationSubscriber(BaseSubscriber):
             notifications_dict['msg'] = "Espacio lateral libre"
 
         emitEvent("notifications", notifications_dict)
+        notifications_dict.clear()

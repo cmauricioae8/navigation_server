@@ -41,6 +41,9 @@ def get_pm2_list() -> list[str]:
             pr['status'] = str(pr_list[i*N_proc+1])
             pr['cpu'] = str(pr_list[i*N_proc+2])
             pr['mem'] = str(pr_list[i*N_proc+3])
+
+            if pr['name'] == 'navigation_server' or pr['name'] == 'teleop-frontend':
+                continue
             pm2_processes.append(pr)
     else:
         return SimpleResponse(status="FAIL", message="No PM2 processes", error="No PM2 processes")
@@ -152,11 +155,11 @@ def get_network_info():
         output = output1.replace("ESSID:","")
         # print("Connected Wifi SSID: " + output)
         output_status = "OK"
-        output_msg = "Operation successful"
+        output_msg = "Wi-Fi connection"
         network_info["name"] = output
     except:
-        output_status = "FAIL"
-        output_msg = "Operation failed"
-        network_info["name"] = "?"
+        output_status = "OK"
+        output_msg = "Ethernet connection"
+        network_info["name"] = "enp2s0"
     
     return DataResponse(status=output_status, message=output_msg, data=network_info)
