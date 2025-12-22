@@ -100,7 +100,7 @@ class NavigationManager:
 
             delivery_stop_waypoint = StopWaypoint(self.delivery_waypoint)
             delivery_stop_waypoint.attempts = 0
-            delivery_stop_waypoint.time_attempt = 0
+            # delivery_stop_waypoint.time_attempt = 0
             delivery_stop_waypoint.stop_time = 0.0
             self.stop_waypoints.append(delivery_stop_waypoint)
 
@@ -245,7 +245,7 @@ class NavigationManager:
 
                     # if cant reach waypoint, try again
                     base_node.logger.info(
-                        "*Navigation*" f"Cant reach waypoint {stop_waypoint.waypoint.name}, try again"
+                        "*Navigation*" f"Cant reach waypoint {stop_waypoint.waypoint.name}, trying again"
                     )
                     time.sleep(2.0)
 

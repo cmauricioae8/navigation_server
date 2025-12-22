@@ -165,7 +165,8 @@ class BaseNode(Node):
                 #Add costmap is available
                 if self.costmap_subscriber.map_available and len(self.costmap_subscriber.map_data.data) > 0:
                     costmap_img = self.costmap_subscriber.getMapImageFromData()
-                    base_map_img = base_map_img + costmap_img
+                    if costmap_img is not None:
+                        base_map_img = base_map_img + costmap_img
 
                 #Add path data
                 if self.path_plan_subscriber.path_plan_available:

@@ -7,11 +7,7 @@ class StopWaypointForm(BaseModel):
         examples=[1, 2],
     )
     attempts: int = Field(
-        description="Número de intentos",
-        examples=[1, 2],
-    )
-    time_attempt: int = Field(
-        description="Tiempo de intento",
+        description="Número de intentos (0 para obligatorio)",
         examples=[1, 2],
     )
     stop_time: float = Field(
@@ -36,19 +32,17 @@ class PathCreateForm(BaseModel):
         examples=[1, 2],
     )
     stop_waypoints: list[StopWaypointForm] = Field(
-        description="Puntos de parada de la trayectoria",
+        description="Puntos de parada de la trayectoria (attempts=0, obligatorio)",
         examples=[
             [
                 {
                     "waypoint": 1,
-                    "attempts": 3,
-                    "time_attempt": 10,
+                    "attempts": 0,
                     "stop_time": 1.0,
                 },
                 {
                     "waypoint": 2,
-                    "attempts": 2,
-                    "time_attempt": 10,
+                    "attempts": 3,
                     "stop_time": 2.0,
                 },
             ],
@@ -62,7 +56,6 @@ class PathCreateForm(BaseModel):
                 {
                     "waypoint": stop_waypoint.waypoint,
                     "attempts": stop_waypoint.attempts,
-                    "time_attempt": stop_waypoint.time_attempt,
                     "stop_time": stop_waypoint.stop_time,
                 }
             )

@@ -8,11 +8,6 @@ class WaypointCreateForm(BaseModel):
         unique=True,
         examples=["waypoint 1", "waypoint 2"],
     )
-    is_mandatory: bool | None = Field(
-        default=True,
-        description="Waypoint obligatorio",
-        examples=[True, False],
-    )
     description: str | None = Field(
         default="",
         description="Descripción del waypoint",
@@ -30,11 +25,6 @@ class WaypointCreateFormManual(BaseModel):
         max_length=50,
         unique=True,
         examples=["waypoint 1", "waypoint 2"],
-    )
-    is_mandatory: bool | None = Field(
-        default=True,
-        description="Waypoint obligatorio",
-        examples=[True, False],
     )
     description: str | None = Field(
         default=None,
@@ -72,11 +62,6 @@ class WaypointUpdateForm(BaseModel):
         max_length=50,
         unique=True,
         examples=["waypoint 1", "waypoint 2"],
-    )
-    is_mandatory: bool | None = Field(
-        default=True,
-        description="Waypoint obligatorio",
-        examples=[True, False],
     )
     description: str | None = Field(
         default=None,

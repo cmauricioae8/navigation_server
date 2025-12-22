@@ -12,7 +12,6 @@ from navigation_server.webapp.apps.waypoints.cruds.waypoint_cruds import waypoin
 class StopWaypointSerializer(BaseModel):
     waypoint: WaypointSerializer
     attempts: int
-    time_attempt: int
     stop_time: float
 
     def __init__(self, stop_waypoint: StopWaypoint):
@@ -22,7 +21,6 @@ class StopWaypointSerializer(BaseModel):
         super().__init__(
             waypoint=WaypointSerializer(stop_waypoint.waypoint) if stop_waypoint.waypoint else None,
             attempts=stop_waypoint.attempts,
-            time_attempt=stop_waypoint.time_attempt,
             stop_time=stop_waypoint.stop_time,
         )
 

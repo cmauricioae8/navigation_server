@@ -121,7 +121,6 @@ def create_waypoint(waypoint_form: WaypointCreateForm):
 
     waypoint = Waypoint(
         name=waypoint_form.name,
-        is_mandatory=waypoint_form.is_mandatory,
         description=waypoint_form.description,
         map_id=waypoint_form.map,
         position_x=base_node.amcl_pose_subscriber.pose_data.position_x,
@@ -171,7 +170,6 @@ def create_waypoint(waypoint_form: WaypointCreateFormManual):
 
     waypoint = Waypoint(
         name=waypoint_form.name,
-        is_mandatory=waypoint_form.is_mandatory,
         description=waypoint_form.description,
         map_id=waypoint_form.map,
         position_x=waypoint_form.position_x,
@@ -200,8 +198,6 @@ def update_waypoint(waypoint_id: int, waypoint_form: WaypointUpdateForm):
     waypoint: Waypoint = waypoint_crud.get_or_404(waypoint_id)
     if waypoint_form.name is not None:
         waypoint.name = waypoint_form.name
-    if waypoint_form.is_mandatory is not None:
-        waypoint.is_mandatory = waypoint_form.is_mandatory
     if waypoint_form.description is not None:
         waypoint.description = waypoint_form.description
     

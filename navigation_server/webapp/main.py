@@ -56,6 +56,7 @@ async def get_redoc(request: Request):
         openapi_url="/openapi.json",
         title="Documentación ReDoc",
         redoc_favicon_url="/favicon.ico",
+        redoc_js_url="/static/js/redoc.standalone.js", # Point to the local file
     )
 
 @app.get("/openapi.json", include_in_schema=False)

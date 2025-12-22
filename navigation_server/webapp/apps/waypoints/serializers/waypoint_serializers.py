@@ -11,7 +11,6 @@ from navigation_server.webapp.apps.waypoints.models import Waypoint
 class WaypointSerializer(BaseModel):
     id: int
     name: str
-    is_mandatory: bool
     description: Optional[str]
     map: MapSimplestSerializer
     position_x: Optional[float]
@@ -25,7 +24,6 @@ class WaypointSerializer(BaseModel):
         super().__init__(
             id=waypoint.id,
             name=waypoint.name,
-            is_mandatory=waypoint.is_mandatory,
             description=waypoint.description,
             map=MapSimplestSerializer(map) if map else None,
             position_x=round(waypoint.position_x, 2) if waypoint.position_x else 0.0,

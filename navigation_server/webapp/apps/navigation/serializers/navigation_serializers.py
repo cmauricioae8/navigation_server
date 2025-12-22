@@ -40,7 +40,7 @@ class NavigationStatusSerializer(BaseSerializer):
     next_waypoint: WaypointSimplestSerializer | None = Field(
         description="Siguiente punto de la trayectoria"
     )
-    attempt: int = Field(description="Número de intentos en el punto actual")
+    attempt: int = Field(description="Número de intentos en el punto actual (si aplica)")
     start_time: datetime = Field(description="Hora de inicio del punto actual")
     state: NavigationState = Field(
         description="Estado de la meta actual",

@@ -11,12 +11,10 @@ class StopWaypoint:
         self,
         waypoint: Waypoint,
         attempts: int = 0,  # 0: infinitely, 1: only one, n: n times
-        time_attempt: int = 0,  # 0: infinitely, n: n seconds
         stop_time: float = 0.0,  # 0: no stop, n: n seconds
     ):
         self.waypoint = waypoint
         self.attempts = attempts
-        self.time_attempt = time_attempt
         self.stop_time = stop_time
 
     def to_dict(self):
