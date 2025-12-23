@@ -22,6 +22,7 @@ from navigation_server.topics.n_people_tracked_subscriber import NoPeopleTracked
 
 from navigation_server.clients.navstack_client import NavStackClient
 from .utils import image_to_base64_str, from_m_to_px
+from navigation_server.webapp.apps.paths.models import StopWaypoint
 
 
 class BaseNode(Node):
@@ -115,7 +116,7 @@ class BaseNode(Node):
         # ros2 topic pub --once /number_people_tracked example_interfaces/msg/Int16 data:\ 2
 
         self.navstack_client = NavStackClient(self)
-        self.stop_waypoints = []
+        self.desired_waypoints: list[StopWaypoint] = []
 
         ## Timer to generate edited map with information
         self.map_layers_timer = self.create_timer(0.5, self.generate_map_layers)
@@ -166,7 +167,10 @@ class BaseNode(Node):
                 if self.costmap_subscriber.map_available and len(self.costmap_subscriber.map_data.data) > 0:
                     costmap_img = self.costmap_subscriber.getMapImageFromData()
                     if costmap_img is not None:
-                        base_map_img = base_map_img + costmap_img
+                        try:
+                            base_map_img = base_map_img + costmap_img
+                        except:
+                            self.logger.warning("costmap_img not same shape of base_map_img")
 
                 #Add path data
                 if self.path_plan_subscriber.path_plan_available:
@@ -181,8 +185,22 @@ class BaseNode(Node):
                         pxf_x = from_m_to_px(pf.position_x - o_x, resolution)
                         pxf_y = from_m_to_px(pf.position_y - o_y, resolution, True, height)
                         
-                        # cv.circle(base_map_img, (px_x, px_y), 2, (0,200,0), -1)
                         cv.line(base_map_img, (px_x, px_y), (pxf_x, pxf_y), (0,200,0), 1)
+                
+                #Add Desired Waypoints with orientation
+                for des_wp in self.desired_waypoints:
+                    des_x, des_y = des_wp.waypoint.position_x, des_wp.waypoint.position_y
+                    des_th = des_wp.waypoint.orientation
+
+                    des_xf, des_yf = des_x + 0.4*cos(des_th), des_y + 0.4*sin(des_th)
+
+                    pixel_x = from_m_to_px(des_x - o_x, resolution)
+                    pixel_y = from_m_to_px(des_y - o_y, resolution, True, height)
+                    pixel_xf = from_m_to_px(des_xf - o_x, resolution)
+                    pixel_yf = from_m_to_px(des_yf - o_y, resolution, True, height)
+
+                    cv.circle(base_map_img, (pixel_x, pixel_y), 5, (0,235,235), -1)
+                    cv.line(base_map_img, (pixel_x, pixel_y), (pixel_xf, pixel_yf), (0,235,235), 2)
                 
                 #Add robot
                 pos_x, pos_y, orientation = 0.0, 0.0, 0.0

@@ -385,6 +385,7 @@ class ModeManager(threading.Thread):
                 base_node.map_layers_timer.reset()
             else:
                 base_node.map_layers_timer.cancel()
+                base_node.desired_waypoints.clear()
 
     def send_status_event(self):
         emitEvent(

@@ -83,6 +83,8 @@ class NavigationManager:
         elif path_id is not None and path_id > 0:
             self.path: Path = path_crud.get(path_id)
             self.stop_waypoints: list[StopWaypoint] = self.path.stop_waypoints()
+
+            base_node.desired_waypoints = self.stop_waypoints
             
             # Conversion from id to waypoint type
             for stop_waypoint in self.stop_waypoints:
