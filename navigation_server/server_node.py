@@ -22,14 +22,21 @@ def main(args=None):
     else:
         base_node.logger.error("Database creation failed.")
 
-    # Create the default admin user if it doesn't exist
-    users: list[User] = user_crud.get_by_field("is_admin", True, allows_multiple=True)
-    if len(users) == 0:
-        base_node.logger.info("No admin user found, creating default user")
-        user = User(username="admin", is_admin=True, is_active=True)
-        user.set_password("admin")
-        user.save()
-        base_node.logger.info("Default user created")
+    # Create the default users if they don't exist
+    default_users = [
+        {"name": "admin", "password":"admin"}, {"name": "administrador", "password":"0ct0p7"},
+        {"name": "eventos", "password":"eventos"},
+    ]
+    
+    for m_user in default_users:
+        users: list[User] = user_crud.get_by_field("username", m_user['name'], allows_multiple=True)
+
+        if len(users) == 0:
+            base_node.logger.info(f"No {m_user['name']} user found, creating by default")
+            user = User(username=m_user['name'], is_admin=True, is_active=True)
+            user.set_password(m_user['password'])
+            user.save()
+            base_node.logger.info(f"{m_user['name']} user created")
     
 
     # Start the webapp
