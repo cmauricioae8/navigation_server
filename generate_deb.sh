@@ -34,7 +34,7 @@ substitute_chars() {
 #Package information setup
 # pkg_dir='mau_functionalities' #repo name
 pkg_name='navigation_server'
-pkg_version='1.0.0' #info from package.xml
+pkg_version='1.1.0' #info from package.xml
 pkg_deb_name=$(substitute_chars "$pkg_name")
 
 # info "package dir (repo name): ${pkg_dir}"

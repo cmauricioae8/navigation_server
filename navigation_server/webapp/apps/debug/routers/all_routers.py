@@ -3,9 +3,11 @@
 from typing import Union
 from fastapi import APIRouter, status
 import subprocess, re
+import logging
 
 from navigation_server.webapp.apps.base.serializers import SimpleResponse, SimpleResponseList, DataResponse
 
+logger = logging.getLogger()
 
 router = APIRouter()
 
@@ -42,6 +44,7 @@ def get_pm2_list() -> list[str]:
             pr['cpu'] = str(pr_list[i*N_proc+2])
             pr['mem'] = str(pr_list[i*N_proc+3])
 
+            ## Remove backend and frontend processes from list
             if pr['name'] == 'navigation_server' or pr['name'] == 'teleop-frontend':
                 continue
             pm2_processes.append(pr)
@@ -127,6 +130,7 @@ def ros_node_list():
     """
     Get ROS Status by running core_status node.
     """
+    logger.warning(f"Running core_status node, black_box node MUST be running")
     cmd_rt = ["ros2","run","mau_core","core_status","-nocolor"]
     ret_cmd_rt = subprocess.run(cmd_rt, stdout=subprocess.PIPE)
     # print(ret_cmd_rt.stdout)

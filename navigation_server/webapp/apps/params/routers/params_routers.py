@@ -3,6 +3,7 @@
 from typing import Union
 from fastapi import APIRouter, status
 import subprocess, re, builtins
+import logging
 
 from navigation_server.webapp.apps.base.serializers import SimpleResponse, DataResponse
 from navigation_server.webapp.settings import SERVER_NODE_NAME
@@ -11,6 +12,8 @@ from navigation_server.webapp.apps.params.forms.params_forms import (
     SetSensorProtectForm,
     SetNavParamsForm,
 )
+
+logger = logging.getLogger()
 
 router = APIRouter()
 
@@ -25,6 +28,7 @@ async def get_robot_params():
     """
     Get ROS Parameters of robot that user can modified.
     """
+    logger.warning(f"Executing ros2 param dump, octy_safe_motion node MUST be running")
     cmd = ["ros2","param","dump","/octy_safe_motion"]
     ret_cmd_rt = subprocess.run(cmd, stdout=subprocess.PIPE)
     output = str(ret_cmd_rt.stdout)

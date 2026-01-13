@@ -346,7 +346,8 @@ class ModeManager(threading.Thread):
 
             # restore last pose
             if self.desired_mode == OperationMode.MAPPING:
-                base_node.logger.info("NO SET POSE ON MAPPING")               
+                base_node.logger.info("NO SET POSE ON MAPPING")
+                base_node.logger.info("Resetting odometry. odometry2 node MUST be running")               
 
                 # Call /reset_odometry service from terminal
                 p = subprocess.Popen(self.reset_odom_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
